@@ -1,6 +1,6 @@
 "use client";
 import {useMemo,useState} from "react";import Link from "next/link";
-type Member={id:string;memberId:string;firstName:string;lastName:string;gender:"Male"|"Female";email:string|null;phone:string;placeOfResidence:string|null;heardAbout:"Friend"|"WhatsApp"|"Instagram"|"Flier"|"Other"|null;heardAboutOther:string|null;firstTimer:boolean;level:"L100"|"L200"|"L300"|"L400"|"L500"|"L600"|"POSTGRADUATE"|null;guest:boolean;createdAt:string};
+export type Member={id:string;memberId:string;firstName:string;lastName:string;gender:"Male"|"Female";email:string|null;phone:string;placeOfResidence:string|null;heardAbout:"Friend"|"WhatsApp"|"Instagram"|"Flier"|"Other"|null;heardAboutOther:string|null;firstTimer:boolean;level:"L100"|"L200"|"L300"|"L400"|"L500"|"L600"|"POSTGRADUATE"|null;guest:boolean;createdAt:string};
 export default function MemberTable({rows}:{rows:Member[]}){
  const[all,setAll]=useState(rows),[query,setQuery]=useState(""),[gender,setGender]=useState(""),[level,setLevel]=useState(""),[first,setFirst]=useState(""),[source,setSource]=useState(""),[from,setFrom]=useState(""),[to,setTo]=useState("");
  const shown=useMemo(()=>all.filter(m=>`${m.firstName} ${m.lastName} ${m.phone} ${m.email||""} ${m.memberId}`.toLowerCase().includes(query.toLowerCase())&&(!gender||m.gender===gender)&&(!level||m.level===level)&&(!first||(m.firstTimer?"Yes":"No")===first)&&(!source||m.heardAbout===source)&&(!from||m.createdAt>=from)&&(!to||m.createdAt.slice(0,10)<=to)),[all,query,gender,level,first,source,from,to]);

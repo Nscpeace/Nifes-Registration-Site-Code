@@ -1,60 +1,44 @@
 # NIFES UNIBEN
 
-Mobile-first registration, programme management and attendance application built with Next.js App Router, React, TypeScript, Auth.js and PostgreSQL/Prisma.
+Mobile-first NIFES UNIBEN registration, programme and attendance website built with Next.js, React, TypeScript, Auth.js, and Cloud Firestore.
 
-## Architecture
+## Features
 
-- `src/app`: public home, registration, self check-in and privacy pages; protected dashboard, members, events, sessions, usher scanner, follow-up, report, access and audit pages; API routes.
-- `src/lib`: Prisma client, phone normalization, RBAC, database-backed rate limits, recurring session generation and open-session selection.
-- `prisma/schema.prisma` and `prisma/migrations`: relational PostgreSQL schema and migration. `prisma/seed.ts` inserts the default programme and active Super Admin.
-- `public/sw.js`: caches only public page shells. It bypasses `/api` and `/admin` so private member/attendance data are not stored in the web cache.
+- Public registration with validation, consent, duplicate protection, member IDs, and downloadable QR codes.
+- Public self check-in, plus staff QR scanning, guest check-in, offline scan queue, and attendance history.
+- Admin dashboard, member records, events and sessions, reports/CSV, first-timer follow-up, access control and audit history.
+- Google sign-in with a server-side allowlist: the seeded Super Admin and email addresses invited by that admin.
+- Light-blue responsive website with Explore navigation, horizontally scrolling programme cards, and inline registration with an animated confirmation.
 
-## Implemented workflows
+## Run locally
 
-- Public registration with server-side validation, required consent, normalized Nigerian phone numbers, duplicate email/phone prevention, sequenced member IDs, a personal QR code, optional Resend email, and friendly duplicate errors.
-- Self check-in by phone or member ID during the selected session window; QR/usher check-in and duplicate attendance prevention; guest quick check-in; live usher attendance list and offline QR check-in queue.
-- Weekly and last-Saturday recurrence generation on demand over an 8-day horizon. TBA events wait until an admin sets a time. Event and venue edits create updated future sessions; existing attendance remains tied to its original session.
-- Google OAuth admin access restricted to seeded/invited emails with verified Google email. Server-side roles protect pages and API endpoints. Super Admin can invite, change role/status, or remove access while protecting the last active Super Admin.
-- Member search and filters, edit/delete, attendance history; CSV member and attendance exports with date, gender, level and session filters; follow-up notes/status and WhatsApp/mail links; absentee report for consecutive Sunday Services; an attendance trend and source breakdown; Super Admin audit log.
-- PostgreSQL-backed fixed-window rate limits for registration and check-in endpoints.
+Requirements: Node.js 22+, pnpm, and a Firebase project with Cloud Firestore enabled.
 
-The offline usher queue stores member IDs in the browser’s local storage until sync. Use a managed usher device and clear the queue after the event. Keep HTTPS enabled.
+1. Copy `.env.example` to `.env.local` and set Firebase service-account credentials, `AUTH_SECRET`, Google OAuth values, and `NEXT_PUBLIC_APP_URL`.
+2. Install packages with `pnpm install`.
+3. Seed the initial programme and Super Admin with `pnpm run db:seed`.
+4. Start the site with `pnpm dev` and open `http://localhost:3000`.
 
-## Setup
+The landing page and its sample schedule still render before Firebase is configured, but registration and attendance writes need a working Firestore connection.
 
-Requirements: Node.js 20+, pnpm, and PostgreSQL 14+.
+## Firebase setup and security
 
-1. Copy `.env.example` to `.env` and set `DATABASE_URL`, `AUTH_SECRET`, Google OAuth values and `NEXT_PUBLIC_APP_URL`.
-2. Install dependencies with `pnpm install`.
-3. Generate Prisma client and apply the checked-in migration: `pnpm run db:generate`, then `pnpm run db:migrate:deploy` (or `pnpm run db:migrate` for local development).
-4. Seed the initial programme and Super Admin: `pnpm run db:seed`.
-5. Start locally with `pnpm run dev`; open `http://localhost:3000`.
+1. Create a Firebase project and a Cloud Firestore database in Native mode.
+2. Create a server service account for the app and grant only the Firestore data role it needs. In local development, use Application Default Credentials by setting `FIREBASE_PROJECT_ID` and `FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=true`, or set `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY`. On Vercel, add the service-account values as encrypted environment variables. A single `FIREBASE_SERVICE_ACCOUNT_JSON` environment variable is also supported.
+3. Set the Firestore rules from `firestore.rules`. Browser clients are denied direct database access; only the Next.js server accesses Firestore through Firebase Admin. Admin SDK access bypasses Firestore rules, so keep the service-account key private and preserve the server-side role checks on every admin page and API.
+4. Run `pnpm run db:seed` once to add the Super Admin and default weekly programme.
 
-`SUPER_ADMIN_EMAIL` defaults to `nscpeace1@gmail.com`. Seeding upserts it as an ACTIVE `SUPER_ADMIN`. OAuth credentials are still required before the account can sign in.
+The app uses server-side Firestore document collections: `members`, `admin_users`, `recurring_events`, `sessions`, `attendance`, `follow_ups`, `audit_logs`, `rate_limits`, and `member_sequences`. Related record checks are made by the Next.js server.
 
-## Google OAuth setup
+## Sign-in and deployment
 
-1. In Google Cloud Console, select a project and configure the OAuth consent screen.
-2. Create an OAuth Client ID of type **Web application**.
-3. Add Authorized JavaScript origins `http://localhost:3000` and your production HTTPS origin.
-4. Add redirect URIs `http://localhost:3000/api/auth/callback/google` and `https://YOUR_DOMAIN/api/auth/callback/google`.
-5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and a generated high-entropy `AUTH_SECRET`. The sign-in callback verifies the Google email and checks current authorization status from PostgreSQL.
+- Google OAuth is used only for staff sign-in. Add the deployed site origin and `https://YOUR_DOMAIN/api/auth/callback/google` as the OAuth web client's authorized origin and redirect URI.
+- Configure `AUTH_SECRET`, `AUTH_URL`, Google OAuth credentials, `SUPER_ADMIN_EMAIL`, the Firebase project/service-account values, and optional email sender values in the hosting environment.
+- Connect the repository to Vercel and deploy on the Node.js 22 runtime.
+- Replace placeholder social/contact links and review the privacy notice before collecting live records.
 
-## Email and hosting
+## Data handling notes
 
-Set `RESEND_API_KEY` and a verified `EMAIL_FROM` sender to deliver welcome mail with the QR PNG attached. Registration still works without email configuration; the QR appears on-screen for download. For Vercel, configure all required environment variables and PostgreSQL first, run `prisma migrate deploy`, seed the database, then deploy. Never commit `.env` or credentials.
-
-## Logo, colours, programme and venue
-
-- Upload the logo to `public/assets/logo.png` (served as `/assets/logo.png`). The current header shows a CSS placeholder with the white circle, blue wordmark and pink cross.
-- Palette variables are at the start of `src/app/globals.css`.
-- The home page reads active recurring events from PostgreSQL. `/admin/events` changes schedule, venue, TBA and check-in windows; `/admin/sessions` creates one-off sessions and opens/closes sessions.
-- Event times use `Africa/Lagos` local time. Recurring sessions are generated automatically when check-in is attempted or the sessions admin page opens, and continue 8 days ahead.
-- A Super Admin adds team emails at `/admin/access`. Invitees use verified Google accounts and are activated on first sign-in.
-
-## Remaining product work
-
-- PDF/XLSX export formats are not included; CSV exports open in Excel.
-- The optional geofence and self check-in via venue QR are not included. Members can use phone/member ID, while ushers scan member QR codes.
-- Full accessibility review, production deployment, managed database provisioning, OAuth setup, backups and email sender verification require the operator’s credentials and should be completed before collecting live records.
-- Replace placeholder contact and social links with official NIFES UNIBEN accounts.
+- The offline usher queue stores member IDs in the browser's local storage until it syncs. Use a managed usher device and clear the queue after each event.
+- CSV exports are included. PDF/XLSX export formats, optional geofencing, and QR-based self check-in at the venue are not included.
+- Firebase Admin server SDK calls are privileged and bypass Firestore Security Rules. API authentication and role checks are therefore the enforcement boundary for staff access; do not expose the service account to browser code.

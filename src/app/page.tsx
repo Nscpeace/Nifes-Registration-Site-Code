@@ -1,3 +1,73 @@
-import Link from "next/link";import {db} from "@/lib/db";
-export const dynamic="force-dynamic";
-export default async function Home(){let stored;let databaseUnavailable=false;try{stored=await db.recurringEvent.findMany({where:{active:true},orderBy:[{weekday:"asc"},{startTime:"asc"}]})}catch{stored=[];databaseUnavailable=true}const defaults=[{day:"Sunday",title:"Foundation Class",time:"2:30 PM",color:"blue",venue:"FAGCOOP Multipurpose Hall"},{day:"Sunday",title:"Sunday Service",time:"3:30 PM",color:"blue",venue:"FAGCOOP Multipurpose Hall"},{day:"Tuesday",title:"Prayer Meeting",time:"5:30 PM",color:"amber",venue:"FAGCOOP Multipurpose Hall"},{day:"Friday",title:"Bible Study",time:"5:00 PM",color:"coral",venue:"FAGCOOP Multipurpose Hall"},{day:"Last Saturday",title:"Mass Evangelism",time:"Time TBA",color:"indigo",venue:"FAGCOOP Multipurpose Hall"}];const events=databaseUnavailable?defaults:stored.map(e=>{const day=e.recurrence==="LAST_SATURDAY"?"Last Saturday":({0:"Sunday",2:"Tuesday",5:"Friday",6:"Saturday"} as Record<number,string>)[e.weekday??-1]??"Weekly";const [h,m]=e.startTime.split(":").map(Number);const time=e.timeTBA?"Time TBA":`${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"PM":"AM"}`;return{day,title:e.name,time,color:day==="Sunday"?"blue":day==="Tuesday"?"amber":day==="Friday"?"coral":"indigo",venue:e.venue}});return <><header className="wrap nav"><Link className="brand" href="/"><span className="logo-placeholder" aria-hidden="true">nifes</span><span>UNIBEN</span></Link><nav className="navlinks"><a href="#programme">Programme</a><a href="#about">About</a><Link href="/privacy">Privacy</Link><Link href="/admin">Admin</Link></nav></header><main><section className="wrap hero"><div><div className="eyebrow">Nigeria Fellowship of Evangelical Students · UNIBEN</div><div className="script">Worship with us on</div><h1>Faith. Purpose.<br/><span style={{color:"#59d5ff"}}>Community.</span></h1><p>Find your people, grow in faith, and build a life of purpose. There’s a seat for you at NIFES UNIBEN.</p><div className="actions"><Link className="btn" href="/register">Register now</Link><Link className="btn ghost" href="/check-in">Check in</Link></div></div><div className="schedule" id="programme">{events.map(e=><div className="event" key={e.title}><span className={`day ${e.color}`}>{e.day}</span><div><strong>{e.title}</strong><small>{e.time} · {e.venue}</small></div></div>)}</div></section><section className="section" id="about"><div className="wrap split"><div><div className="eyebrow">Building Tomorrow’s Leaders Today</div><h2>A place to belong and become.</h2><p>NIFES is a community of students growing together through God’s word, prayer, worship and service. Come as you are and discover what fellowship can mean for your university journey.</p></div><div className="glass"><h2>Find us at UNIBEN</h2><p>FAGCOOP Multipurpose Hall<br/>University of Benin, Ugbowo, Benin City</p><a className="btn ghost" href="https://maps.google.com/?q=FAGCOOP+Multipurpose+Hall+University+of+Benin" target="_blank" rel="noreferrer">Open Google Maps ↗</a><p>Connect with us: <a href="mailto:nifesuniben@example.com">Email</a> · <a href="https://instagram.com/" target="_blank" rel="noreferrer">Instagram</a> · <a href="https://wa.me/" target="_blank" rel="noreferrer">WhatsApp</a></p></div></div></section></main><footer className="footer"><div className="wrap">© {new Date().getFullYear()} NIFES UNIBEN · <Link href="/privacy">Privacy notice</Link><span style={{float:"right"}}>Logo file: <code>/public/assets/logo.png</code></span></div></footer></>}
+import Link from "next/link";
+import { ExploreMenu } from "@/components/explore-menu";
+import { RegistrationForm } from "@/components/registration-form";
+import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+type ProgrammeCard = { day: string; title: string; time: string; venue: string; color: string };
+
+const fallbackProgramme: ProgrammeCard[] = [
+  { day: "Sunday", title: "Foundation Class", time: "2:30 PM", venue: "FAGCOOP Multipurpose Hall", color: "blue" },
+  { day: "Sunday", title: "Sunday Service", time: "3:30 PM", venue: "FAGCOOP Multipurpose Hall", color: "blue" },
+  { day: "Tuesday", title: "Prayer Meeting", time: "5:30 PM", venue: "FAGCOOP Multipurpose Hall", color: "amber" },
+  { day: "Friday", title: "Bible Study", time: "5:00 PM", venue: "FAGCOOP Multipurpose Hall", color: "coral" },
+  { day: "Last Saturday", title: "Mass Evangelism", time: "Time TBA", venue: "FAGCOOP Multipurpose Hall", color: "indigo" },
+];
+
+export default async function Home() {
+  let programme = fallbackProgramme;
+  try {
+    const stored = await db.recurringEvent.findMany({ where: { active: true }, orderBy: [{ weekday: "asc" }, { startTime: "asc" }] });
+    programme = stored.map((event) => {
+      const day = event.recurrence === "LAST_SATURDAY" ? "Last Saturday" : ({ 0: "Sunday", 2: "Tuesday", 5: "Friday", 6: "Saturday" } as Record<number, string>)[event.weekday ?? -1] ?? "Weekly";
+      const [hour, minute] = event.startTime.split(":").map(Number);
+      const time = event.timeTBA ? "Time TBA" : `${hour % 12 || 12}:${String(minute).padStart(2, "0")} ${hour >= 12 ? "PM" : "AM"}`;
+      return { day, title: event.name, time, venue: event.venue, color: day === "Sunday" ? "blue" : day === "Tuesday" ? "amber" : day === "Friday" ? "coral" : "indigo" };
+    });
+  } catch {
+    // The landing page stays useful as a preview even before a data service is connected.
+  }
+
+  return (
+    <main>
+      <header className="site-header site-container">
+        <Link className="site-brand" href="/" aria-label="NIFES UNIBEN home"><span className="brand-mark">nifes<span>✚</span></span><span>UNIBEN</span></Link>
+        <ExploreMenu />
+      </header>
+
+      <section className="hero-section" aria-labelledby="hero-title">
+        <div className="site-container hero-grid">
+          <div className="hero-copy">
+            <span className="eyebrow">Nigeria Fellowship of Evangelical Students · UNIBEN</span>
+            <p className="hero-kicker">Worship with us</p>
+            <h1 id="hero-title">Faith. Purpose.<br /><span>Community.</span></h1>
+            <p className="hero-description">Find your people, grow in faith, and build a life of purpose. There’s a seat for you at NIFES UNIBEN.</p>
+            <div className="hero-actions"><a className="button button-primary" href="#register">Register with us <span aria-hidden="true">↓</span></a><Link className="button button-secondary" href="/check-in">Member check-in</Link></div>
+          </div>
+          <div className="hero-art" aria-hidden="true"><div className="hero-orbit orbit-one"/><div className="hero-orbit orbit-two"/><div className="hero-cross">✚</div><div className="hero-caption">Growing together<br /><strong>in Christ</strong></div></div>
+        </div>
+      </section>
+
+      <section className="about-section" id="about">
+        <div className="site-container about-grid">
+          <div><span className="eyebrow">Building tomorrow’s leaders today</span><h2>A place to belong<br />and become.</h2></div>
+          <div className="about-copy"><p>NIFES is a community of students growing together through God’s word, prayer, worship and service. Come as you are and discover what fellowship can mean for your university journey.</p><div className="venue-card"><span className="venue-icon" aria-hidden="true">⌖</span><div><strong>Find us at UNIBEN</strong><p>FAGCOOP Multipurpose Hall<br />University of Benin, Ugbowo, Benin City</p></div></div></div>
+        </div>
+      </section>
+
+      <section className="program-section" id="programs">
+        <div className="site-container">
+          <div className="section-heading"><div><span className="eyebrow">Gather with us</span><h2>Our weekly programs</h2></div><span className="section-hint">Scroll to explore <span aria-hidden="true">→</span></span></div>
+          <div className="program-strip" aria-label="Weekly NIFES programs">
+            {programme.map((event) => <article className="program-card" key={event.title}><span className={`program-day ${event.color}`}>{event.day}</span><h3>{event.title}</h3><p>{event.time}</p><small>{event.venue}</small></article>)}
+          </div>
+        </div>
+      </section>
+
+      <RegistrationForm />
+
+      <footer className="site-footer"><div className="site-container footer-inner"><span>© {new Date().getFullYear()} NIFES UNIBEN</span><Link href="/privacy">Privacy notice</Link><a href="mailto:nifesuniben@example.com">Get in touch</a></div></footer>
+    </main>
+  );
+}
