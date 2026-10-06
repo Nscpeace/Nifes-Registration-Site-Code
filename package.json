@@ -1,0 +1,8 @@
+{
+  "name": "nifes-uniben",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "dev": "next dev", "build": "prisma generate && next build", "start": "next start", "db:generate": "prisma generate", "db:migrate": "prisma migrate dev", "db:migrate:deploy": "prisma migrate deploy", "db:seed": "tsx prisma/seed.ts" },
+  "dependencies": { "@prisma/client": "^6.8.2", "html5-qrcode": "^2.3.8", "next": "^15.3.2", "next-auth": "^5.0.0-beta.28", "qrcode": "^1.5.4", "react": "^19.0.0", "react-dom": "^19.0.0", "zod": "^3.24.4" },
+  "devDependencies": { "@types/node": "^22.15.21", "@types/qrcode": "^1.5.5", "@types/react": "^19.0.4", "@types/react-dom": "^19.0.4", "prisma": "^6.8.2", "tsx": "^4.19.4", "typescript": "^5.8.3", "tailwindcss": "^4.1.7", "@tailwindcss/postcss": "^4.1.7" }
+}
