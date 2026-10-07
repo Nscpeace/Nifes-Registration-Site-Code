@@ -36,13 +36,13 @@ LOCAL SECRETS
 
 CURRENT BLOCKERS
 - Firestore seed is unverified. `pnpm run db:seed` attempted to replace `node_modules` in a non-interactive session. Direct Node execution reported a bundled-runtime `uv_os_get_passwd returned ENOMEM`; a workaround run did not return confirmation. The Firestore console showed no collections afterward. Retry in a normal interactive Node.js 22+ environment and verify `admin_users` and `recurring_events` collections.
-- Vercel is not deployed. Owner authorization to access Vercel and configure secrets is recorded. Owner screenshots show `https://vercel.com` set to “Always allow” for browsing and downloads under Agent permissions. A subsequent browser launch still returned “saved user permission setting blocks this action.” The allowed UI state and browser-tool policy are inconsistent; stop and ask the owner to restart the app or report the issue. Do not use another browser, CLI, or indirect route.
+- Vercel is not deployed. The owner explicitly authorized access and secret configuration. Owner screenshots showed `https://vercel.com` set to “Always allow” for browsing and downloads under Agent permissions. The owner restarted Codex; a fresh Vercel navigation still returned the saved-permission block. This is an unresolved mismatch between the visible setting and browser enforcement. Do not try another browser, CLI, or indirect route; owner must resolve the app/browser permission issue.
 - Production OAuth origin and callback require the final Vercel domain.
 
 REMAINING WORK (ORDER)
 1. In a normal Node.js 22+ terminal, run `pnpm run db:seed`; verify Firestore contains the Super Admin and `recurring_events`.
 2. Verify local Google admin sign-in with the OAuth credentials in `.env.local`; only then disable/delete the older OAuth client secret.
-3. Owner has allowed `https://vercel.com` in Settings → Browser → Agent permissions. If a fresh browser session still reports it blocked, stop and ask the owner to restart the app or resolve the site-permission inconsistency; do not bypass it. Once the browser accepts the permission, create/link Vercel project to `Nscpeace/Nifes-Registration-Site-Code`.
+3. Owner allowed `https://vercel.com` and restarted Codex, but the fresh browser session still blocked it. Resolve the mismatch with the app/browser permission controls before attempting any Vercel work; do not bypass it. Once access is accepted, create/link the Vercel project to `Nscpeace/Nifes-Registration-Site-Code`.
 4. Add production OAuth origin `https://<production-domain>` and callback `https://<production-domain>/api/auth/callback/google` to the Google OAuth client.
 5. Set Vercel Production environment variables: `AUTH_SECRET`, `AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SUPER_ADMIN_EMAIL=nkezechibuikem123@gmail.com`, `FIREBASE_PROJECT_ID=nifes-registration-site`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=false`, and `NEXT_PUBLIC_APP_URL`. Optional email delivery: `RESEND_API_KEY`, `EMAIL_FROM`.
 6. Deploy with Node.js 22+. Verify registration writes, Google admin sign-in, member records, check-in, and reports.
@@ -61,7 +61,7 @@ PROMPT FOR A FUTURE AI
 "Continue work on the NIFES UNIBEN registration website in the existing private repository. Read this file and repository state first. Firebase project `nifes-registration-site`, Johannesburg Standard Firestore, Google OAuth consent, test user, local OAuth credentials, and Firebase Admin credentials are configured. Confirm or run the Firestore seed in an interactive Node.js 22+ environment. Then finish Vercel setup only after Vercel browser access is permitted, add production OAuth URLs, set the authorized environment variables, deploy, and verify the site end to end. Do not bypass browser permission blocks. Do not put secrets in Git, this file, or chat."
 
 CODEX BROWSER PERMISSION — VERCEL
-Owner set `https://vercel.com` to “Always allow” for browsing and downloads in Agent permissions, verified in screenshots on 2026-10-07. The browser tool still reports a conflicting saved block. After the owner restarts the app or the permission state refreshes, check access once. Do not bypass the browser permission.
+Owner set `https://vercel.com` to “Always allow” for browsing and downloads, verified in screenshots on 2026-10-07, then restarted Codex. A fresh navigation still returned the saved-permission block. This permission mismatch remains unresolved. Do not bypass the browser permission.
 
 REPLICATION / HANDOFF CHECKLIST FOR ANOTHER CODING AI
 1. Open the private repository `https://github.com/Nscpeace/Nifes-Registration-Site-Code` and read this file, `README.md`, and the app source before editing. Preserve existing work and make source changes in the repository.
