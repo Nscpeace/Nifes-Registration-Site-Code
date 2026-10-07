@@ -36,7 +36,7 @@ LOCAL SECRETS
 
 CURRENT BLOCKERS
 - Firestore seed is unverified. `pnpm run db:seed` attempted to replace `node_modules` in a non-interactive session. Direct Node execution reported a bundled-runtime `uv_os_get_passwd returned ENOMEM`; a workaround run did not return confirmation. The Firestore console showed no collections afterward. Retry in a normal interactive Node.js 22+ environment and verify `admin_users` and `recurring_events` collections.
-- Vercel is not deployed. The owner explicitly authorized access and secret configuration, but `vercel.com` is blocked by a saved browser permission setting. Do not try an alternate route to bypass this block. The owner must change the saved permission setting or configure the Vercel project directly.
+- Vercel is not deployed. The owner explicitly authorized access and secret configuration, but `vercel.com` is blocked by a saved browser permission setting. Do not try an alternate route to bypass this block. The owner reported allowing Vercel in Settings → Browser, but the browser still returns a saved-permission block for `https://vercel.com`. Ask the owner to check that `vercel.com` is removed from Blocked sites and saved under Allowed; do not try another browser, CLI, or indirect route.
 - Production OAuth origin and callback require the final Vercel domain.
 
 REMAINING WORK (ORDER)
