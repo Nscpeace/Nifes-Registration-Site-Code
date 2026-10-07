@@ -30,11 +30,7 @@ COMPLETED CLOUD SETUP
    - User support/contact email: nkezechibuikem123@gmail.com
    - Audience: External (testing mode)
    - Google API Services User Data Policy accepted by the account owner.
-5. Created OAuth web client named "NIFES Registration Site" in project `nifes-registration-site`.
-   - Authorized JavaScript origin: `http://localhost:3000`
-   - Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-   - The one-time Google dialog was closed before the client secret was stored. The client record exists, but its secret is not in this repository or chat; rotate/create a replacement client secret before app configuration.
-   - Production callback/origin still need to be added after a Vercel production URL exists.
+5. Created two Google OAuth Web clients in project `nifes-registration-site`; use the client named "NIFES Registration Site Local" for local development. It has origin `http://localhost:3000` and callback `http://localhost:3000/api/auth/callback/google`. The first client secret dialog was closed before saving. The Local client secret is also not present in the current `.env.local`; add a new client secret in Google Auth Platform → Clients and save it locally. The Client ID is visible in the Google Cloud console; secrets cannot be viewed again after creation. Production callback/origin still need to be added after a Vercel production URL exists.
 6. Repository `.env.example` and seed defaults set the Super Admin email to `nkezechibuikem123@gmail.com`.
 7. Repository `.env.example` now includes the Firebase project ID `nifes-registration-site`.
 
@@ -44,26 +40,21 @@ IMPORTANT REPOSITORY / SECRET HANDLING
 - Keep secrets in local ignored `.env.local` for development and in Vercel Project → Settings → Environment Variables for deployment.
 - Do not paste secrets into chat, issue comments, public docs, or this file.
 
+CURRENT LOCAL STATUS
+- `.env.local` is ignored by Git and currently contains the local `AUTH_SECRET` plus Firebase project ID, Admin SDK client email, and private key. Never print or commit these values.
+- A Firebase Admin SDK key was created and downloaded from Google Cloud. Its private credential is configured in the ignored `.env.local`; the downloaded JSON remains in the user Downloads folder.
+- OAuth consent and the admin test-user entry are configured. However, `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are not currently present in `.env.local`. Add the Client ID and create a fresh client secret, then save both locally before trying sign-in.
+- `pnpm run db:seed` did not run: pnpm attempted to replace `node_modules` in a non-interactive session. Invoking the configured Node script directly also failed inside the bundled runtime (`uv_os_get_passwd returned ENOMEM`). Do not delete or reinstall `node_modules` blindly. Retry the seed command in a normal interactive terminal after confirming a standard Node.js 22+ environment.
+- Vercel deployment is not complete. Production OAuth redirect URLs and Vercel environment variables depend on the final production domain.
+
 REMAINING WORK (DO IN THIS ORDER)
-1. Securely store the OAuth Client ID and Client Secret from the Google Cloud client dialog. If the secret dialog has been closed, rotate/create a replacement client secret in Google Auth Platform → Clients. Add the admin email to Google Auth Platform → Audience → Test users while the app remains in testing.
-2. Create/download a Firebase Admin SDK service-account credential for project `nifes-registration-site`. Keep the private key private. Either use `FIREBASE_SERVICE_ACCOUNT_JSON` or the separate project ID, client email, and private key variables supported by `src/lib/db.ts`.
-3. Create a Vercel project connected to the private GitHub repository, or deploy the repository to Vercel. Confirm the exact production URL.
-4. Add the production OAuth JavaScript origin (`https://<production-domain>`) and callback (`https://<production-domain>/api/auth/callback/google`) to the Google OAuth Web client. Keep the localhost entries for development.
-5. Configure Vercel environment variables for Production (and Preview if wanted):
-   - `AUTH_SECRET` (generate a strong random value)
-   - `AUTH_URL` (production URL)
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-   - `SUPER_ADMIN_EMAIL=nkezechibuikem123@gmail.com`
-   - `FIREBASE_PROJECT_ID=nifes-registration-site`
-   - `FIREBASE_SERVICE_ACCOUNT_JSON` OR `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`
-   - `FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=false`
-   - `NEXT_PUBLIC_APP_URL` (production URL)
-   - Optional email delivery: `RESEND_API_KEY` and `EMAIL_FROM`.
-6. Ensure Node.js 22 or later is selected (package.json specifies `engines.node >=22`).
-7. With Firebase credentials available locally in ignored `.env.local`, run `npm run db:seed` once to create the initial Super Admin and programmes.
-8. Build/deploy to Vercel and verify registration writes to Firestore, Google admin sign-in, member records access, attendance/check-in, and reports. Test production callback after updating Google OAuth URIs.
-9. If any source code or environment template changes are needed, make them in the local repository and commit/push them to the private GitHub repository. Never commit credentials.
+1. Add a new secret to the Google OAuth client named "NIFES Registration Site Local" and save `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` only in ignored `.env.local`. Keep the localhost origin and callback configured. Admin `nkezechibuikem123@gmail.com` is already on the OAuth test-user list.
+2. In an interactive terminal with Node.js 22+, run `pnpm run db:seed` once to initialize the Firestore admin and event data. Confirm no `node_modules` purge/reinstall is needed first.
+3. Create/link the Vercel project to the private GitHub repository `Nscpeace/Nifes-Registration-Site-Code` and identify the deployment URL.
+4. Add the production OAuth origin (`https://<production-domain>`) and callback (`https://<production-domain>/api/auth/callback/google`) to the OAuth client.
+5. Set Vercel Production environment variables: `AUTH_SECRET`, `AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SUPER_ADMIN_EMAIL=nkezechibuikem123@gmail.com`, `FIREBASE_PROJECT_ID=nifes-registration-site`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=false`, and `NEXT_PUBLIC_APP_URL`. Optional email: `RESEND_API_KEY`, `EMAIL_FROM`. Do not place secrets in GitHub.
+6. Deploy with Node.js 22+ and verify Google admin sign-in, registration writes, member-record access, attendance/check-in, and reports.
+7. Save all source and documentation changes to this private repository. Never commit credentials.
 
 USEFUL CONSOLE PAGES
 - Firebase project overview: https://console.firebase.google.com/project/nifes-registration-site/overview
@@ -76,4 +67,3 @@ USEFUL CONSOLE PAGES
 
 PROMPT FOR A FUTURE AI
 "Continue the NIFES UNIBEN registration site setup from this file and the existing private repository. Read the repository instructions and current state first. The app code is already implemented; Firebase project `nifes-registration-site` and its Johannesburg Standard `(default)` Firestore database already exist. Google OAuth consent screen and a localhost Web client already exist. Finish OAuth test-user configuration, Firebase Admin credentials, Vercel project/environment setup, production callback URLs and deployment. Ask the owner to complete any required legal terms, access grants, or confirmations. Do not put secrets in Git, this text file, or chat; use ignored local `.env.local` and Vercel environment variables. Save every code/documentation change to the repository and verify the deployed site end to end."
-
