@@ -14,7 +14,7 @@ const app = getApps()[0] ?? initializeApp({ projectId, credential });
 const firestore = getFirestore(app);
 
 async function main() {
-  const email = (process.env.SUPER_ADMIN_EMAIL || "nscpeace1@gmail.com").trim().toLowerCase();
+  const email = (process.env.SUPER_ADMIN_EMAIL || "nkezechibuikem123@gmail.com").trim().toLowerCase();
   const adminId = `admin_${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
   await firestore.collection("admin_users").doc(adminId).set({ id: adminId, email, role: "SUPER_ADMIN", status: "ACTIVE", invitedBy: null, createdAt: new Date(), lastLoginAt: null }, { merge: true });
 
