@@ -33,7 +33,7 @@ COMPLETED CLOUD SETUP
 5. Created OAuth web client named "NIFES Registration Site" in project `nifes-registration-site`.
    - Authorized JavaScript origin: `http://localhost:3000`
    - Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-   - The Google dialog showed that the generated client secret must be securely stored before closing; do not put it in this file, in source code, or in Git.
+   - The one-time Google dialog was closed before the client secret was stored. The client record exists, but its secret is not in this repository or chat; rotate/create a replacement client secret before app configuration.
    - Production callback/origin still need to be added after a Vercel production URL exists.
 6. Repository `.env.example` and seed defaults set the Super Admin email to `nkezechibuikem123@gmail.com`.
 7. Repository `.env.example` now includes the Firebase project ID `nifes-registration-site`.
@@ -76,3 +76,4 @@ USEFUL CONSOLE PAGES
 
 PROMPT FOR A FUTURE AI
 "Continue the NIFES UNIBEN registration site setup from this file and the existing private repository. Read the repository instructions and current state first. The app code is already implemented; Firebase project `nifes-registration-site` and its Johannesburg Standard `(default)` Firestore database already exist. Google OAuth consent screen and a localhost Web client already exist. Finish OAuth test-user configuration, Firebase Admin credentials, Vercel project/environment setup, production callback URLs and deployment. Ask the owner to complete any required legal terms, access grants, or confirmations. Do not put secrets in Git, this text file, or chat; use ignored local `.env.local` and Vercel environment variables. Save every code/documentation change to the repository and verify the deployed site end to end."
+
