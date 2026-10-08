@@ -55,8 +55,8 @@ export default async function Home() {
             <p className="hero-description">Find your people, grow in faith, and build a life of purpose. There’s a seat for you at NIFES UNIBEN.</p>
             <div className="hero-actions">
               <a className="button button-primary" href="#register">Register with us <span aria-hidden="true">↓</span></a>
-              <Link className="button button-secondary" href="/check-in">Member check-in</Link>
-              <Link className="button button-secondary" href="/records">Member's records</Link>
+              <Link className="button button-secondary" href="/records" style={{ fontWeight: 700 }}>Member's records</Link>
+              <Link className="button button-secondary" href="/check-in">Fellowship check-in</Link>
             </div>
           </div>
           <div className="hero-art" aria-hidden="true">

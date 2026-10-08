@@ -1,4 +1,108 @@
-import { NextResponse } from "next/server";import { z } from "zod";import { auth } from "@/auth";import { db } from "@/lib/db";
-export async function POST(req:Request){const session=await auth();if(!session?.user?.adminId||session.user.role!=="SUPER_ADMIN")return NextResponse.json({error:"Forbidden"},{status:403});try{const {email,role}=z.object({email:z.string().email(),role:z.enum(["ADMIN","USHER"])}).parse(await req.json());const normalized=email.trim().toLowerCase();const existing=await db.adminUser.findUnique({where:{email:normalized}});if(existing?.role==="SUPER_ADMIN")return NextResponse.json({error:"Super Admin access cannot be changed here."},{status:409});const user=await db.adminUser.upsert({where:{email:normalized},update:{role,status:"INVITED"},create:{email:normalized,role,status:"INVITED",invitedBy:session.user.adminId}});await db.auditLog.create({data:{adminId:session.user.adminId,action:"ACCESS_INVITED",details:{email:normalized,role}}});return NextResponse.json({id:user.id}, {status:201})}catch{return NextResponse.json({error:"Enter a valid email and role."},{status:400})}}
-export async function PATCH(req:Request){const s=await auth();if(!s?.user?.adminId||s.user.role!=="SUPER_ADMIN")return NextResponse.json({error:"Forbidden"},{status:403});try{const d=z.object({email:z.string().email(),role:z.enum(["ADMIN","USHER","SUPER_ADMIN"]).optional(),status:z.enum(["INVITED","ACTIVE","DISABLED"]).optional()}).parse(await req.json());const email=d.email.trim().toLowerCase(),old=await db.adminUser.findUnique({where:{email}});if(!old)return NextResponse.json({error:"Authorised email not found."},{status:404});const losingSuper=old.role==="SUPER_ADMIN"&&(d.role!==undefined&&d.role!=="SUPER_ADMIN"||d.status==="DISABLED");if(losingSuper){if(old.id===s.user.adminId)return NextResponse.json({error:"You cannot disable or downgrade your own Super Admin account."},{status:409});const count=await db.adminUser.count({where:{role:"SUPER_ADMIN",status:"ACTIVE"}});if(count<2)return NextResponse.json({error:"The last active Super Admin cannot be disabled or downgraded."},{status:409})}const user=await db.adminUser.update({where:{email},data:{...(d.role?{role:d.role}:{}),...(d.status?{status:d.status}:{})}});await db.auditLog.create({data:{adminId:s.user.adminId,action:"ACCESS_UPDATED",details:{email,role:user.role,status:user.status}}});return NextResponse.json({ok:true})}catch{return NextResponse.json({error:"Could not update access."},{status:400})}}
-export async function DELETE(req:Request){const s=await auth();if(!s?.user?.adminId||s.user.role!=="SUPER_ADMIN")return NextResponse.json({error:"Forbidden"},{status:403});try{const {email}=z.object({email:z.string().email()}).parse(await req.json());const normalized=email.trim().toLowerCase(),user=await db.adminUser.findUnique({where:{email:normalized}});if(!user)return NextResponse.json({error:"Authorised email not found."},{status:404});if(user.id===s.user.adminId)return NextResponse.json({error:"You cannot remove your own account."},{status:409});if(user.role==="SUPER_ADMIN"){const count=await db.adminUser.count({where:{role:"SUPER_ADMIN",status:"ACTIVE"}});if(count<2||user.status!=="ACTIVE")return NextResponse.json({error:"The last active Super Admin cannot be removed."},{status:409})}await db.auditLog.create({data:{adminId:s.user.adminId,action:"ACCESS_REMOVED",details:{email:normalized,role:user.role}}});await db.adminUser.delete({where:{email:normalized}});return NextResponse.json({ok:true})}catch{return NextResponse.json({error:"Could not remove access."},{status:400})}}
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { resolveAdminSession } from "@/lib/access";
+
+export async function POST(req: Request) {
+  const session = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
+  if (!session?.user?.adminId || session.user.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const { email, role } = z.object({
+      email: z.string().email(),
+      role: z.enum(["ADMIN", "USHER"]),
+    }).parse(await req.json());
+
+    const normalized = email.trim().toLowerCase();
+    const existing = await db.adminUser.findUnique({ where: { email: normalized } });
+    if (existing?.role === "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Super Admin access cannot be changed here." }, { status: 409 });
+    }
+
+    const user = await db.adminUser.upsert({
+      where: { email: normalized },
+      update: { role, status: "INVITED" },
+      create: { email: normalized, role, status: "INVITED", invitedBy: session.user.adminId },
+    });
+
+    await db.auditLog.create({
+      data: {
+        adminId: session.user.adminId,
+        action: "ACCESS_INVITED",
+        details: { email: normalized, role },
+      },
+    });
+
+    return NextResponse.json({ id: user.id }, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Enter a valid email and role." }, { status: 400 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  const s = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
+  if (!s?.user?.adminId || s.user.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const d = z.object({
+      email: z.string().email(),
+      role: z.enum(["ADMIN", "USHER", "SUPER_ADMIN"]).optional(),
+      status: z.enum(["INVITED", "ACTIVE", "DISABLED"]).optional(),
+    }).parse(await req.json());
+
+    const email = d.email.trim().toLowerCase();
+    const old = await db.adminUser.findUnique({ where: { email } });
+    if (!old) return NextResponse.json({ error: "Authorised email not found." }, { status: 404 });
+
+    const losingSuper = old.role === "SUPER_ADMIN" && ((d.role !== undefined && d.role !== "SUPER_ADMIN") || d.status === "DISABLED");
+    if (losingSuper) {
+      if (old.id === s.user.adminId) return NextResponse.json({ error: "You cannot disable or downgrade your own Super Admin account." }, { status: 409 });
+      const count = await db.adminUser.count({ where: { role: "SUPER_ADMIN", status: "ACTIVE" } });
+      if (count < 2) return NextResponse.json({ error: "The last active Super Admin cannot be disabled or downgraded." }, { status: 409 });
+    }
+
+    const user = await db.adminUser.update({
+      where: { email },
+      data: { ...(d.role ? { role: d.role } : {}), ...(d.status ? { status: d.status } : {}) },
+    });
+
+    await db.auditLog.create({
+      data: { adminId: s.user.adminId, action: "ACCESS_UPDATED", details: { email, role: user.role, status: user.status } },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Could not update access." }, { status: 400 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  const s = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
+  if (!s?.user?.adminId || s.user.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const { email } = z.object({ email: z.string().email() }).parse(await req.json());
+    const normalized = email.trim().toLowerCase();
+    const user = await db.adminUser.findUnique({ where: { email: normalized } });
+    if (!user) return NextResponse.json({ error: "Authorised email not found." }, { status: 404 });
+    if (user.id === s.user.adminId) return NextResponse.json({ error: "You cannot remove your own account." }, { status: 409 });
+    if (user.role === "SUPER_ADMIN") {
+      const count = await db.adminUser.count({ where: { role: "SUPER_ADMIN", status: "ACTIVE" } });
+      if (count < 2 || user.status !== "ACTIVE") return NextResponse.json({ error: "The last active Super Admin cannot be removed." }, { status: 409 });
+    }
+
+    await db.auditLog.create({
+      data: { adminId: s.user.adminId, action: "ACCESS_REMOVED", details: { email: normalized, role: user.role } },
+    });
+    await db.adminUser.delete({ where: { email: normalized } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Could not remove access." }, { status: 400 });
+  }
+}
