@@ -38,12 +38,17 @@ const firebaseCredentialsAvailable = Boolean(
 const firebaseApp = firebaseCredentialsAvailable ? (getApps()[0] ?? initializeApp(firebaseOptions())) : null;
 const firestore: Firestore = firebaseApp ? getFirestore(firebaseApp) : (null as any);
 
-const memoryStore = new Map<ModelName, Map<string, Row>>();
-let memoryInitialized = false;
+const globalForDb = globalThis as unknown as {
+  nifesMemoryStore?: Map<ModelName, Map<string, Row>>;
+  nifesMemoryInitialized?: boolean;
+};
+
+const memoryStore = globalForDb.nifesMemoryStore ?? new Map<ModelName, Map<string, Row>>();
+globalForDb.nifesMemoryStore = memoryStore;
 
 function initMemoryStore() {
-  if (memoryInitialized) return;
-  memoryInitialized = true;
+  if (globalForDb.nifesMemoryInitialized) return;
+  globalForDb.nifesMemoryInitialized = true;
   for (const model of Object.keys(collections) as ModelName[]) {
     if (!memoryStore.has(model)) memoryStore.set(model, new Map());
   }
@@ -59,18 +64,23 @@ function initMemoryStore() {
     memoryStore.get("recurringEvent")!.set(evt.id, evt);
   }
 
-  const superAdminEmail = (process.env.SUPER_ADMIN_EMAIL || "nkezechibuikem123@gmail.com").trim().toLowerCase();
-  const adminId = `admin_${createHash("sha256").update(superAdminEmail).digest("hex").slice(0, 32)}`;
-  const defaultAdmin: Row = {
-    id: adminId,
-    email: superAdminEmail,
-    role: "SUPER_ADMIN",
-    status: "ACTIVE",
-    invitedBy: null,
-    createdAt: new Date(),
-    lastLoginAt: null,
-  };
-  memoryStore.get("adminUser")!.set(adminId, defaultAdmin);
+  const adminEmails = [
+    "nscpeace1@gmail.com",
+    (process.env.SUPER_ADMIN_EMAIL || "nkezechibuikem123@gmail.com").trim().toLowerCase(),
+  ];
+  for (const email of adminEmails) {
+    const adminId = `admin_${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
+    const adminUser: Row = {
+      id: adminId,
+      email,
+      role: "SUPER_ADMIN",
+      status: "ACTIVE",
+      invitedBy: null,
+      createdAt: new Date(),
+      lastLoginAt: null,
+    };
+    memoryStore.get("adminUser")!.set(adminId, adminUser);
+  }
 }
 
 function firebaseOptions() {
