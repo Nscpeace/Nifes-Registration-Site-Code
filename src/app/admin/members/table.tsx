@@ -19,7 +19,7 @@ export type Member = {
   createdAt: string;
 };
 
-export default function MemberTable({ rows }: { rows: Member[] }) {
+export default function MemberTable({ rows, adminEmail }: { rows: Member[]; adminEmail?: string }) {
   const [all, setAll] = useState(rows);
   const [query, setQuery] = useState("");
   const [gender, setGender] = useState("");
@@ -56,7 +56,8 @@ export default function MemberTable({ rows }: { rows: Member[] }) {
     data.heardAboutOther = data.heardAbout === "Other" ? String(data.heardAboutOther || "") : null;
 
     try {
-      const r = await fetch(`/api/admin/members/${m.id}`, {
+      const queryParam = adminEmail ? `?admin=${encodeURIComponent(adminEmail)}` : "";
+      const r = await fetch(`/api/admin/members/${m.id}${queryParam}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -87,7 +88,8 @@ export default function MemberTable({ rows }: { rows: Member[] }) {
 
   async function remove(m: Member) {
     try {
-      const r = await fetch(`/api/admin/members/${m.id}`, { method: "DELETE" });
+      const queryParam = adminEmail ? `?admin=${encodeURIComponent(adminEmail)}` : "";
+      const r = await fetch(`/api/admin/members/${m.id}${queryParam}`, { method: "DELETE" });
       if (r.ok) {
         setAll((a) => a.filter((x) => x.id !== m.id));
         setNotification({ text: `Member ${m.firstName} deleted.` });
@@ -183,7 +185,7 @@ export default function MemberTable({ rows }: { rows: Member[] }) {
                   <strong>{m.firstName} {m.lastName}</strong>
                   {m.guest && <span style={{ color: "#f43f5e", fontSize: "0.75rem", marginLeft: 6 }}>Guest</span>}
                   <small style={{ display: "block", color: "#85aed3", fontFamily: "monospace" }}>{m.memberId}</small>
-                  <Link href={`/admin/members/${m.id}/attendance`} style={{ fontSize: "0.78rem", color: "#3da6f5", textDecoration: "underline" }}>
+                  <Link href={`/admin/members/${m.id}/attendance${adminEmail ? `?admin=${encodeURIComponent(adminEmail)}` : ""}`} style={{ fontSize: "0.78rem", color: "#3da6f5", textDecoration: "underline" }}>
                     Attendance history
                   </Link>
                 </td>

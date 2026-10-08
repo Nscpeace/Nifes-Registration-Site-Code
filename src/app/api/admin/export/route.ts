@@ -7,8 +7,10 @@ const levelSchema=z.enum(["L100","L200","L300","L400","L500","L600","POSTGRADUAT
 const genderSchema=z.enum(["Male","Female"]);
 function csv(value:unknown){let text=value==null?"":value instanceof Date?value.toISOString():String(value);if(/^[=+\-@\t\r]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`}
 
+import { resolveAdminSession } from "@/lib/access";
+
 export async function GET(req:Request){
- const session=await auth();
+ const session = await resolveAdminSession(["SUPER_ADMIN","ADMIN"], undefined, req);
  if(!session?.user?.adminId||!["SUPER_ADMIN","ADMIN"].includes(session.user.role||""))return NextResponse.json({error:"Forbidden"},{status:403});
  const url=new URL(req.url),type=url.searchParams.get("type")||"members",from=url.searchParams.get("from"),to=url.searchParams.get("to"),sessionId=url.searchParams.get("sessionId"),rawGender=url.searchParams.get("gender"),rawLevel=url.searchParams.get("level");
  const gender=rawGender?genderSchema.safeParse(rawGender):null,level=rawLevel?levelSchema.safeParse(rawLevel):null;
