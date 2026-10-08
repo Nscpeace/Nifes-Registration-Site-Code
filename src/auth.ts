@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import { db } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET || "development-fallback-secret-for-nifes-uniben-32char",
   providers: [Google],
   pages: { signIn: "/admin/login" },
   callbacks: {

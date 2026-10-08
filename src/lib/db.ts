@@ -1,7 +1,7 @@
 import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getFirestore, Timestamp, type DocumentData, type DocumentReference } from "firebase-admin/firestore";
+import { getFirestore, Timestamp, type DocumentData, type DocumentReference, type Firestore } from "firebase-admin/firestore";
 
 type ModelName = "member" | "adminUser" | "recurringEvent" | "session" | "attendance" | "followUp" | "auditLog" | "rateLimit" | "memberSequence";
 type Row = Record<string, any>;
@@ -28,13 +28,50 @@ const collections: Record<ModelName, string> = {
   attendance: "attendance", followUp: "follow_ups", auditLog: "audit_logs", rateLimit: "rate_limits", memberSequence: "member_sequences",
 };
 
-const firebaseApp = getApps()[0] ?? initializeApp(firebaseOptions());
-const firestore = getFirestore(firebaseApp);
 const firebaseCredentialsAvailable = Boolean(
   process.env.FIREBASE_SERVICE_ACCOUNT_JSON ||
   (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) ||
-  (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === "true"),
+  (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === "true") ||
+  process.env.GOOGLE_APPLICATION_CREDENTIALS,
 );
+
+const firebaseApp = firebaseCredentialsAvailable ? (getApps()[0] ?? initializeApp(firebaseOptions())) : null;
+const firestore: Firestore = firebaseApp ? getFirestore(firebaseApp) : (null as any);
+
+const memoryStore = new Map<ModelName, Map<string, Row>>();
+let memoryInitialized = false;
+
+function initMemoryStore() {
+  if (memoryInitialized) return;
+  memoryInitialized = true;
+  for (const model of Object.keys(collections) as ModelName[]) {
+    if (!memoryStore.has(model)) memoryStore.set(model, new Map());
+  }
+
+  const defaultEvents: Row[] = [
+    { id: "foundation-class", name: "Foundation Class", recurrence: "WEEKLY", weekday: 0, startTime: "14:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+    { id: "sunday-service", name: "Sunday Service", recurrence: "WEEKLY", weekday: 0, startTime: "15:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+    { id: "prayer-meeting", name: "Prayer Meeting", recurrence: "WEEKLY", weekday: 2, startTime: "17:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+    { id: "bible-study", name: "Bible Study", recurrence: "WEEKLY", weekday: 5, startTime: "17:00", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+    { id: "mass-evangelism", name: "Mass Evangelism", recurrence: "LAST_SATURDAY", weekday: null, startTime: "12:00", timeTBA: true, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+  ];
+  for (const evt of defaultEvents) {
+    memoryStore.get("recurringEvent")!.set(evt.id, evt);
+  }
+
+  const superAdminEmail = (process.env.SUPER_ADMIN_EMAIL || "nkezechibuikem123@gmail.com").trim().toLowerCase();
+  const adminId = `admin_${createHash("sha256").update(superAdminEmail).digest("hex").slice(0, 32)}`;
+  const defaultAdmin: Row = {
+    id: adminId,
+    email: superAdminEmail,
+    role: "SUPER_ADMIN",
+    status: "ACTIVE",
+    invitedBy: null,
+    createdAt: new Date(),
+    lastLoginAt: null,
+  };
+  memoryStore.get("adminUser")!.set(adminId, defaultAdmin);
+}
 
 function firebaseOptions() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -139,12 +176,15 @@ function compareValue(actual: any, expected: any): boolean {
 }
 
 async function all(model: ModelName): Promise<Row[]> {
-  if (!firebaseCredentialsAvailable) throw new Error("Firebase is not configured. Add the Firebase service account environment variables.");
+  if (!firebaseCredentialsAvailable) {
+    initMemoryStore();
+    return Array.from(memoryStore.get(model)?.values() ?? []).map((row) => ({ ...row }));
+  }
   const snapshot = await firestore.collection(collections[model]).get();
-  return snapshot.docs.map((document) => ({ id: document.id, ...hydrateValue(document.data()) }));
+  return snapshot.docs.map((document: any) => ({ id: document.id, ...hydrateValue(document.data()) }));
 }
 async function candidateRows(model: ModelName, where?: Row): Promise<Row[]> {
-  if (!where) return all(model);
+  if (!firebaseCredentialsAvailable || !where) return all(model);
   const fields = flattenWhere(where);
   const relationFields = Object.keys(fields).filter((field) => relation(model, field));
   if ("OR" in fields || "AND" in fields || "NOT" in fields || relationFields.length) return all(model);
@@ -160,7 +200,7 @@ async function candidateRows(model: ModelName, where?: Row): Promise<Row[]> {
   const expected = value instanceof Date ? Timestamp.fromDate(value) : value && typeof value === "object" && !(value instanceof Date) ? value[operator] : value;
   const firestoreValue = expected instanceof Date ? Timestamp.fromDate(expected) : expected;
   const snapshot = await firestore.collection(collections[model]).where(field, operatorMap[operator], firestoreValue).get();
-  return snapshot.docs.map((document) => ({ id: document.id, ...hydrateValue(document.data()) }));
+  return snapshot.docs.map((document: any) => ({ id: document.id, ...hydrateValue(document.data()) }));
 }
 async function matches(model: ModelName, row: Row, rawWhere: Row = {}): Promise<boolean> {
   const where = flattenWhere(rawWhere);
@@ -252,6 +292,28 @@ function memberUniqueRef(field: "email" | "phone", value: string) {
 async function createRow(model: ModelName, source: Row): Promise<Row> {
   const row = defaults(model, source);
   const id = docId(model, row); row.id = row.id || id;
+  if (!firebaseCredentialsAvailable) {
+    initMemoryStore();
+    const store = memoryStore.get(model)!;
+    if (model === "member") {
+      const email = row.email?.toLowerCase();
+      const phone = row.phone;
+      const allMembers = Array.from(store.values());
+      if (allMembers.some((m) => (email && m.email?.toLowerCase() === email) || (phone && m.phone === phone))) {
+        assertUniqueError();
+      }
+    } else if (uniqueFields(model).length) {
+      const allRows = Array.from(store.values());
+      const matchesExisting = uniqueFields(model).some((fields) => {
+        if (fields.some((field) => row[field] === null || row[field] === undefined)) return false;
+        return allRows.some((candidate) => fields.every((field) => candidate[field] === row[field]));
+      });
+      if (matchesExisting) assertUniqueError();
+    }
+    if (store.has(id)) assertUniqueError();
+    store.set(id, { ...row });
+    return row;
+  }
   const ref = firestore.collection(collections[model]).doc(id);
   if (model === "member") {
     const email = row.email?.toLowerCase();
@@ -287,6 +349,13 @@ async function updateRow(model: ModelName, where: Row, data: Row): Promise<Row> 
   if (!found) throw error("P2025", "Record not found.");
   const next = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, updateValue(found[key], value)]));
   if (model === "followUp" && !("updatedAt" in next)) next.updatedAt = new Date();
+  if (!firebaseCredentialsAvailable) {
+    initMemoryStore();
+    const store = memoryStore.get(model)!;
+    const updated = { ...found, ...next };
+    store.set(found.id, updated);
+    return updated;
+  }
   const ref = firestore.collection(collections[model]).doc(found.id);
   if (model === "member") {
     await firestore.runTransaction(async (transaction) => {
@@ -317,6 +386,22 @@ async function updateRow(model: ModelName, where: Row, data: Row): Promise<Row> 
 async function deleteRow(model: ModelName, where: Row): Promise<Row> {
   const found = (await all(model)).find((row) => Object.entries(flattenWhere(where)).every(([key, value]) => compareValue(row[key], value)));
   if (!found) throw error("P2025", "Record not found.");
+  if (!firebaseCredentialsAvailable) {
+    initMemoryStore();
+    const store = memoryStore.get(model)!;
+    store.delete(found.id);
+    if (model === "member") {
+      const attendances = memoryStore.get("attendance")!;
+      for (const [k, v] of attendances) if (v.memberId === found.id) attendances.delete(k);
+      const followUps = memoryStore.get("followUp")!;
+      for (const [k, v] of followUps) if (v.memberId === found.id) followUps.delete(k);
+    }
+    if (model === "session") {
+      const attendances = memoryStore.get("attendance")!;
+      for (const [k, v] of attendances) if (v.sessionId === found.id) attendances.delete(k);
+    }
+    return found;
+  }
   if (model === "member") {
     const related = await Promise.all(["attendance", "followUp"].map(async (child) => {
       const childModel = child as ModelName;
@@ -354,6 +439,19 @@ function createModel(model: ModelName): any {
       return { count: rows.length };
     },
     upsert: async ({ where, create, update, select, include }: Row) => {
+      if (!firebaseCredentialsAvailable) {
+        initMemoryStore();
+        if (model === "memberSequence") {
+          const year = String(create.year ?? where.year);
+          const store = memoryStore.get(model)!;
+          const current = store.get(year);
+          const row = current ? { ...current, nextValue: current.nextValue + Number(update.nextValue?.increment ?? 0) } : defaults(model, create);
+          store.set(year, row);
+          return project(model, row, { select, include });
+        }
+        const current = (await findRows(model, { where, take: 1 }))[0];
+        return project(model, current ? await updateRow(model, where, update) : await createRow(model, create), { select, include });
+      }
       if (model === "memberSequence") {
         const year = String(create.year ?? where.year);
         const ref = firestore.collection(collections.memberSequence).doc(year);
@@ -386,7 +484,14 @@ function createModel(model: ModelName): any {
 export const db = Object.fromEntries((Object.keys(collections) as ModelName[]).map((model) => [model, createModel(model)])) as DatabaseApi;
 db.$disconnect = async () => {};
 db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: number) => {
-  if (!firebaseCredentialsAvailable) throw new Error("Firebase is not configured. Add the Firebase service account environment variables.");
+  if (!firebaseCredentialsAvailable) {
+    initMemoryStore();
+    const store = memoryStore.get("rateLimit")!;
+    const row = store.get(key);
+    const hits = row && row.resetAt instanceof Date && row.resetAt > now ? row.hits + 1 : 1;
+    store.set(key, { id: key, key, hits, resetAt: row?.resetAt instanceof Date && row.resetAt > now ? row.resetAt : resetAt });
+    return hits > maximum;
+  }
   const ref = firestore.collection(collections.rateLimit).doc(key);
   return firestore.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(ref);

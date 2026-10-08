@@ -1,0 +1,8 @@
+{
+  "name": "NIFES UNIBEN",
+  "description": "Fellowship management, attendance tracking, and member registration system for NIFES UNIBEN.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
