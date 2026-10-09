@@ -20,7 +20,22 @@ export async function GET(req:Request){
  let lines:string[]=[];
  if(type==="attendance"){
   const records=await db.attendance.findMany({where:{...(sessionId?{sessionId}:{}),...(gender?.success||level?.success?{member:{...(gender?.success?{gender:gender.data}:{}),...(level?.success?{level:level.data}:{})}}:{}),checkedInAt:dateRange},include:{member:true,session:true},orderBy:{checkedInAt:"desc"}});
-  lines=["Member ID,First Name,Last Name,Email,Phone,Session,Venue,Checked In At,Method",...records.map(a=>[a.member.memberId,a.member.firstName,a.member.lastName,a.member.email,a.member.phone,a.session.name,a.session.venue,a.checkedInAt,a.method].map(csv).join(","))];
+  lines=["Member ID,First Name,Last Name,Email,Phone,Session,Day of Service,Venue,Checked In At,Method",...records.map(a=>{
+    const sName = a.session?.name || "Fellowship Service";
+    let day = a.session?.dayOfService;
+    if (!day) {
+      const lower = sName.toLowerCase();
+      if (lower.includes("sunday") || lower.includes("foundation")) day = "Sunday";
+      else if (lower.includes("prayer") || lower.includes("tuesday")) day = "Tuesday";
+      else if (lower.includes("bible") || lower.includes("friday")) day = "Friday";
+      else if (lower.includes("evangelism") || lower.includes("saturday")) day = "Last Saturday";
+      else {
+        const d = a.checkedInAt instanceof Date ? a.checkedInAt : new Date(a.checkedInAt || Date.now());
+        day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()] || "Weekly";
+      }
+    }
+    return [a.member?.memberId || "",a.member?.firstName || "",a.member?.lastName || "",a.member?.email || "",a.member?.phone || "",sName,day,a.session?.venue || "",a.checkedInAt,a.method].map(csv).join(",");
+  })];
  }else{
   const records=await db.member.findMany({where:{...(gender?.success?{gender:gender.data}:{}),...(level?.success?{level:level.data}:{}),createdAt:dateRange},orderBy:{createdAt:"desc"}});
   lines=["First Name,Last Name,Gender,Email,Phone,Residence,Level,Heard About,First Timer,Member ID,Date Registered",...records.map(m=>{const source=m.heardAbout?`${m.heardAbout}${m.heardAboutOther?` (${m.heardAboutOther})`:""}`:"";return[m.firstName,m.lastName,m.gender,m.email,m.phone,m.placeOfResidence,m.level,source,m.firstTimer?"Yes":"No",m.memberId,m.createdAt].map(csv).join(",")})];

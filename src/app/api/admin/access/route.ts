@@ -1,21 +1,40 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { db, clearAllAuthorizedExceptSuperAdmin, PRIMARY_ADMIN_EMAIL } from "@/lib/db";
 import { resolveAdminSession } from "@/lib/access";
 
 export async function POST(req: Request) {
   const session = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
   if (!session?.user?.adminId || session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden: Super Admin access required." }, { status: 403 });
   }
 
   try {
+    const body = await req.json();
+
+    // Check if clearAll action requested via POST
+    if (body.action === "CLEAR_ALL" || body.clearAll) {
+      const result = await clearAllAuthorizedExceptSuperAdmin();
+      await db.auditLog.create({
+        data: {
+          adminId: session.user.adminId,
+          action: "ACCESS_ALL_CLEARED",
+          details: { retained: PRIMARY_ADMIN_EMAIL, clearedCount: result.deletedCount },
+        },
+      });
+      return NextResponse.json({ ok: true, cleared: result.deletedCount });
+    }
+
     const { email, role } = z.object({
       email: z.string().email(),
       role: z.enum(["ADMIN", "USHER"]),
-    }).parse(await req.json());
+    }).parse(body);
 
     const normalized = email.trim().toLowerCase();
+    if (normalized === PRIMARY_ADMIN_EMAIL) {
+      return NextResponse.json({ error: "Primary Admin nscpeace1@gmail.com is already configured." }, { status: 409 });
+    }
+
     const existing = await db.adminUser.findUnique({ where: { email: normalized } });
     if (existing?.role === "SUPER_ADMIN") {
       return NextResponse.json({ error: "Super Admin access cannot be changed here." }, { status: 409 });
@@ -23,8 +42,8 @@ export async function POST(req: Request) {
 
     const user = await db.adminUser.upsert({
       where: { email: normalized },
-      update: { role, status: "INVITED" },
-      create: { email: normalized, role, status: "INVITED", invitedBy: session.user.adminId },
+      update: { role, status: "ACTIVE" },
+      create: { email: normalized, role, status: "ACTIVE", invitedBy: session.user.adminId },
     });
 
     await db.auditLog.create({
@@ -55,15 +74,12 @@ export async function PATCH(req: Request) {
     }).parse(await req.json());
 
     const email = d.email.trim().toLowerCase();
+    if (email === PRIMARY_ADMIN_EMAIL && (d.status === "DISABLED" || (d.role && d.role !== "SUPER_ADMIN"))) {
+      return NextResponse.json({ error: "Primary Admin nscpeace1@gmail.com cannot be disabled or downgraded." }, { status: 409 });
+    }
+
     const old = await db.adminUser.findUnique({ where: { email } });
     if (!old) return NextResponse.json({ error: "Authorised email not found." }, { status: 404 });
-
-    const losingSuper = old.role === "SUPER_ADMIN" && ((d.role !== undefined && d.role !== "SUPER_ADMIN") || d.status === "DISABLED");
-    if (losingSuper) {
-      if (old.id === s.user.adminId) return NextResponse.json({ error: "You cannot disable or downgrade your own Super Admin account." }, { status: 409 });
-      const count = await db.adminUser.count({ where: { role: "SUPER_ADMIN", status: "ACTIVE" } });
-      if (count < 2) return NextResponse.json({ error: "The last active Super Admin cannot be disabled or downgraded." }, { status: 409 });
-    }
 
     const user = await db.adminUser.update({
       where: { email },
@@ -83,19 +99,34 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
   const s = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
   if (!s?.user?.adminId || s.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden: Super Admin access required." }, { status: 403 });
   }
 
   try {
-    const { email } = z.object({ email: z.string().email() }).parse(await req.json());
+    const body = await req.json();
+
+    // Check if clearing all authorized emails except primary owner
+    if (body.clearAll === true) {
+      const result = await clearAllAuthorizedExceptSuperAdmin();
+      await db.auditLog.create({
+        data: {
+          adminId: s.user.adminId,
+          action: "ACCESS_ALL_CLEARED",
+          details: { retained: PRIMARY_ADMIN_EMAIL, clearedCount: result.deletedCount },
+        },
+      });
+      return NextResponse.json({ ok: true, cleared: result.deletedCount });
+    }
+
+    const { email } = z.object({ email: z.string().email() }).parse(body);
     const normalized = email.trim().toLowerCase();
+
+    if (normalized === PRIMARY_ADMIN_EMAIL) {
+      return NextResponse.json({ error: "Primary Super Admin nscpeace1@gmail.com cannot be removed." }, { status: 409 });
+    }
+
     const user = await db.adminUser.findUnique({ where: { email: normalized } });
     if (!user) return NextResponse.json({ error: "Authorised email not found." }, { status: 404 });
-    if (user.id === s.user.adminId) return NextResponse.json({ error: "You cannot remove your own account." }, { status: 409 });
-    if (user.role === "SUPER_ADMIN") {
-      const count = await db.adminUser.count({ where: { role: "SUPER_ADMIN", status: "ACTIVE" } });
-      if (count < 2 || user.status !== "ACTIVE") return NextResponse.json({ error: "The last active Super Admin cannot be removed." }, { status: 409 });
-    }
 
     await db.auditLog.create({
       data: { adminId: s.user.adminId, action: "ACCESS_REMOVED", details: { email: normalized, role: user.role } },

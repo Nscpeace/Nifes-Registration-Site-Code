@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { cookies, headers } from "next/headers";
-import { db } from "@/lib/db";
+import { cookies } from "next/headers";
+import { db, PRIMARY_ADMIN_EMAIL, clearAllAuthorizedExceptSuperAdmin, ensureInitialAuthorizationPurge } from "@/lib/db";
 
 export type AdminSession = {
   user: {
@@ -13,30 +13,60 @@ export type AdminSession = {
   };
 };
 
+export async function isEmailAuthorized(
+  email: string
+): Promise<{ authorized: boolean; role?: string; status?: string }> {
+  // Ensure the legacy list purge has executed
+  await ensureInitialAuthorizationPurge();
+
+  const normalized = email.trim().toLowerCase();
+  if (normalized === PRIMARY_ADMIN_EMAIL) {
+    return { authorized: true, role: "SUPER_ADMIN", status: "ACTIVE" };
+  }
+
+  // Any other email must have been explicitly authorized by nscpeace1@gmail.com in db.adminUser
+  const admin = await db.adminUser.findUnique({ where: { email: normalized } });
+  if (
+    admin &&
+    (admin.role === "SUPER_ADMIN" || admin.role === "ADMIN" || admin.role === "USHER") &&
+    (admin.status === "ACTIVE" || admin.status === "INVITED")
+  ) {
+    return { authorized: true, role: admin.role, status: admin.status };
+  }
+
+  return { authorized: false };
+}
+
 export async function resolveAdminSession(
   roles: string[] = ["SUPER_ADMIN", "ADMIN"],
   queryAdminEmail?: string,
   req?: Request
 ): Promise<AdminSession | null> {
+  await ensureInitialAuthorizationPurge();
+
   // 1. Try NextAuth session
   try {
     const session = await auth();
-    if (session?.user?.adminId && session.user.role && roles.includes(session.user.role)) {
-      return {
-        user: {
-          id: session.user.adminId,
-          adminId: session.user.adminId,
-          email: session.user.email || "nscpeace1@gmail.com",
-          role: session.user.role,
-          name: (session.user.email || "admin").split("@")[0],
-        },
-      };
+    if (session?.user?.email) {
+      const authEmail = session.user.email.trim().toLowerCase();
+      const authInfo = await isEmailAuthorized(authEmail);
+      if (authInfo.authorized && authInfo.role && roles.includes(authInfo.role)) {
+        return {
+          user: {
+            id: session.user.adminId || `admin_${authEmail}`,
+            adminId: session.user.adminId || `admin_${authEmail}`,
+            email: authEmail,
+            role: authInfo.role,
+            name: session.user.name || authEmail.split("@")[0],
+          },
+        };
+      }
     }
   } catch {
-    // Proceed to fallback checks
+    // Proceed to cookie verification
   }
 
-  // 2. Cookie or query or header verification
+  // 2. Cookie verification
   let cookieEmail: string | undefined;
   let isLoggedOut = false;
 
@@ -45,7 +75,6 @@ export async function resolveAdminSession(
     cookieEmail = cookieStore.get("nifes_admin_email")?.value?.trim().toLowerCase();
     isLoggedOut = cookieStore.get("nifes_logged_out")?.value === "1";
   } catch {
-    // In contexts where cookies() is not directly available, check req header
     if (req) {
       const cookieHeader = req.headers.get("cookie") || "";
       const match = cookieHeader.match(/nifes_admin_email=([^;]+)/);
@@ -54,53 +83,30 @@ export async function resolveAdminSession(
     }
   }
 
-  let refererEmail: string | undefined;
-  try {
-    const h = await headers();
-    const referer = h.get("referer");
-    if (referer) {
-      const refUrl = new URL(referer);
-      refererEmail =
-        refUrl.searchParams.get("admin")?.trim().toLowerCase() ||
-        refUrl.searchParams.get("email")?.trim().toLowerCase();
-    }
-  } catch {}
-
-  let reqUrlEmail: string | undefined;
-  if (req) {
-    try {
-      const parsedUrl = new URL(req.url);
-      reqUrlEmail =
-        parsedUrl.searchParams.get("admin")?.trim().toLowerCase() ||
-        parsedUrl.searchParams.get("email")?.trim().toLowerCase();
-    } catch {}
-  }
-
-  // Priority order for candidate email
-  let candidateEmail =
-    queryAdminEmail?.trim().toLowerCase() ||
-    reqUrlEmail ||
-    cookieEmail ||
-    refererEmail;
-
-  // If user explicitly logged out and did not specify an email, do not auto-login
-  if (!candidateEmail && isLoggedOut) {
+  if (isLoggedOut) {
     return null;
   }
 
-  // Default to the owner super admin email: nscpeace1@gmail.com
+  // Candidate email must come from verified cookie (or explicit authorized query in API calls)
+  let candidateEmail = cookieEmail;
+  if (!candidateEmail && queryAdminEmail) {
+    candidateEmail = queryAdminEmail.trim().toLowerCase();
+  }
+
   if (!candidateEmail) {
-    candidateEmail = "nscpeace1@gmail.com";
+    return null;
+  }
+
+  // STRICT CHECK: candidate email must be authorized!
+  const authInfo = await isEmailAuthorized(candidateEmail);
+  if (!authInfo.authorized || !authInfo.role || !roles.includes(authInfo.role)) {
+    return null;
   }
 
   let admin = await db.adminUser.findUnique({ where: { email: candidateEmail } });
 
-  // Auto-provision Super Admin if needed
-  if (
-    !admin &&
-    (candidateEmail === "nscpeace1@gmail.com" ||
-      candidateEmail === (process.env.SUPER_ADMIN_EMAIL || "").toLowerCase())
-  ) {
+  // Auto-provision primary admin if needed
+  if (!admin && candidateEmail === PRIMARY_ADMIN_EMAIL) {
     admin = await db.adminUser.create({
       data: {
         email: candidateEmail,
@@ -111,7 +117,11 @@ export async function resolveAdminSession(
     });
   }
 
-  if (admin && admin.status === "ACTIVE" && roles.includes(admin.role)) {
+  if (
+    admin &&
+    (admin.status === "ACTIVE" || admin.status === "INVITED") &&
+    roles.includes(admin.role)
+  ) {
     return {
       user: {
         id: admin.id,
@@ -126,6 +136,10 @@ export async function resolveAdminSession(
   return null;
 }
 
+export async function clearAuthorizationList(): Promise<{ deletedCount: number }> {
+  return await clearAllAuthorizedExceptSuperAdmin();
+}
+
 export async function requireRole(
   roles: string[] = ["SUPER_ADMIN", "ADMIN"],
   queryAdminEmail?: string
@@ -136,5 +150,5 @@ export async function requireRole(
     return session;
   }
 
-  redirect("/admin/login?callbackUrl=/admin/members");
+  redirect("/records?login=1");
 }

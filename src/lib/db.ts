@@ -64,23 +64,18 @@ function initMemoryStore() {
     memoryStore.get("recurringEvent")!.set(evt.id, evt);
   }
 
-  const adminEmails = [
-    "nscpeace1@gmail.com",
-    (process.env.SUPER_ADMIN_EMAIL || "nkezechibuikem123@gmail.com").trim().toLowerCase(),
-  ];
-  for (const email of adminEmails) {
-    const adminId = `admin_${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
-    const adminUser: Row = {
-      id: adminId,
-      email,
-      role: "SUPER_ADMIN",
-      status: "ACTIVE",
-      invitedBy: null,
-      createdAt: new Date(),
-      lastLoginAt: null,
-    };
-    memoryStore.get("adminUser")!.set(adminId, adminUser);
-  }
+  const primaryAdmin = "nscpeace1@gmail.com";
+  const adminId = `admin_${createHash("sha256").update(primaryAdmin).digest("hex").slice(0, 32)}`;
+  const adminUser: Row = {
+    id: adminId,
+    email: primaryAdmin,
+    role: "SUPER_ADMIN",
+    status: "ACTIVE",
+    invitedBy: null,
+    createdAt: new Date(),
+    lastLoginAt: null,
+  };
+  memoryStore.get("adminUser")!.set(adminId, adminUser);
 }
 
 function firebaseOptions() {
@@ -511,3 +506,72 @@ db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: num
     return hits > maximum;
   });
 };
+
+export const PRIMARY_ADMIN_EMAIL = "nscpeace1@gmail.com";
+
+let initialPurgeExecuted = false;
+
+export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCount: number }> {
+  let deletedCount = 0;
+  const primaryEmail = PRIMARY_ADMIN_EMAIL;
+  const primaryId = `admin_${createHash("sha256").update(primaryEmail).digest("hex").slice(0, 32)}`;
+
+  // 1. Purge from in-memory store
+  initMemoryStore();
+  const userMap = memoryStore.get("adminUser");
+  if (userMap) {
+    for (const [id, user] of Array.from(userMap.entries())) {
+      if ((user.email || "").trim().toLowerCase() !== primaryEmail) {
+        userMap.delete(id);
+        deletedCount++;
+      }
+    }
+    userMap.set(primaryId, {
+      id: primaryId,
+      email: primaryEmail,
+      role: "SUPER_ADMIN",
+      status: "ACTIVE",
+      invitedBy: null,
+      createdAt: new Date(),
+      lastLoginAt: null,
+    });
+  }
+
+  // 2. Purge from Firestore if credentials are active
+  if (firebaseCredentialsAvailable && firestore) {
+    try {
+      const snap = await firestore.collection(collections.adminUser).get();
+      const batch = firestore.batch();
+      for (const doc of snap.docs) {
+        const data = doc.data();
+        const email = String(data.email || "").trim().toLowerCase();
+        if (email !== primaryEmail) {
+          batch.delete(doc.ref);
+          deletedCount++;
+        }
+      }
+      const primaryRef = firestore.collection(collections.adminUser).doc(primaryId);
+      batch.set(primaryRef, {
+        id: primaryId,
+        email: primaryEmail,
+        role: "SUPER_ADMIN",
+        status: "ACTIVE",
+        invitedBy: null,
+        createdAt: new Date(),
+        lastLoginAt: null,
+      }, { merge: true });
+      await batch.commit();
+    } catch (e) {
+      console.error("Firestore admin clearance error:", e);
+    }
+  }
+
+  return { deletedCount };
+}
+
+export async function ensureInitialAuthorizationPurge(): Promise<void> {
+  if (initialPurgeExecuted) return;
+  initialPurgeExecuted = true;
+  await clearAllAuthorizedExceptSuperAdmin();
+}
+
