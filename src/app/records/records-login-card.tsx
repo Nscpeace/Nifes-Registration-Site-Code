@@ -13,7 +13,7 @@ export default function RecordsLoginCard({
   initialAttemptedEmail = "",
   initialIsUnauthorized = false,
 }: RecordsLoginCardProps) {
-  const [email, setEmail] = useState(initialAttemptedEmail || "nscpeace1@gmail.com");
+  const [email, setEmail] = useState(initialAttemptedEmail || "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function RecordsLoginCard({
       ? {
           type: "unauthorized",
           attempted: initialAttemptedEmail,
-          message: `${initialAttemptedEmail} has not been authorized by administrator nscpeace1@gmail.com.`,
+          message: `${initialAttemptedEmail} has not been authorized to access Member Records.`,
         }
       : null
   );
@@ -37,6 +37,14 @@ export default function RecordsLoginCard({
 
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
+
+    if (!trimmedEmail) {
+      setErrorInfo({
+        type: "empty",
+        message: "Please enter your email address.",
+      });
+      return;
+    }
 
     if (!trimmedPassword) {
       setErrorInfo({
@@ -55,7 +63,7 @@ export default function RecordsLoginCard({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: trimmedEmail || "nscpeace1@gmail.com",
+          email: trimmedEmail,
           password: trimmedPassword,
         }),
       });
@@ -85,7 +93,7 @@ export default function RecordsLoginCard({
             attempted,
             message:
               data.message ||
-              `${attempted} has not been authorized by administrator nscpeace1@gmail.com.`,
+              `${attempted} has not been authorized to access Member Records.`,
           });
         }
       }
@@ -218,8 +226,7 @@ export default function RecordsLoginCard({
                 <span style={{ color: "#fee2e2" }}>
                   {errorInfo.attempted ? (
                     <>
-                      <strong>{errorInfo.attempted}</strong> has not been authorized by administrator{" "}
-                      <strong>nscpeace1@gmail.com</strong>.
+                      <strong>{errorInfo.attempted}</strong> has not been authorized to access Member Records.
                     </>
                   ) : (
                     errorInfo.message
@@ -281,7 +288,7 @@ export default function RecordsLoginCard({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              autoComplete="email"
+              autoComplete="off"
               style={{
                 width: "100%",
                 padding: "12px 14px",

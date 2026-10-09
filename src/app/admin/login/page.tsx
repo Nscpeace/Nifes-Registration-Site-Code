@@ -145,10 +145,9 @@ export default async function Login({
               id="email"
               name="email"
               type="email"
-              placeholder="e.g. nscpeace1@gmail.com"
+              placeholder="e.g. admin@example.com"
               required
-              autoComplete="email"
-              defaultValue="nscpeace1@gmail.com"
+              autoComplete="off"
               style={{ padding: "12px 14px", fontSize: "0.95rem" }}
             />
           </div>

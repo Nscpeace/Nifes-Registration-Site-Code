@@ -11,8 +11,19 @@ export async function POST(req: Request) {
     const rawEmail = typeof body.email === "string" ? body.email : "";
     const rawPassword = typeof body.password === "string" ? body.password : "";
 
-    const email = rawEmail.trim().toLowerCase() || PRIMARY_ADMIN_EMAIL;
+    const email = rawEmail.trim().toLowerCase();
     const password = rawPassword.trim();
+
+    if (!email) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "missing_email",
+          message: "Email address is required.",
+        },
+        { status: 200 }
+      );
+    }
 
     // 1. Strict Password Verification
     if (!password) {
@@ -46,7 +57,7 @@ export async function POST(req: Request) {
           ok: false,
           error: "unauthorized",
           attempted: email,
-          message: `Access Denied: ${email} has not been authorized by administrator ${PRIMARY_ADMIN_EMAIL}.`,
+          message: `Access Denied: ${email} has not been authorized to access Member Records.`,
         },
         { status: 200 }
       );
@@ -70,6 +81,10 @@ export async function POST(req: Request) {
       });
     }
 
+    const host = req.headers.get("host") || "";
+    const proto = req.headers.get("x-forwarded-proto") || "";
+    const isSecure = proto === "https" || (!host.includes("localhost") && !host.includes("127.0.0.1"));
+
     // 4. Set authentication cookies
     const cookieStore = await cookies();
     cookieStore.delete("nifes_logged_out");
@@ -77,13 +92,13 @@ export async function POST(req: Request) {
       path: "/",
       maxAge: 0,
       expires: new Date(0),
-      sameSite: "none",
-      secure: true,
+      sameSite: isSecure ? "none" : "lax",
+      secure: isSecure,
     });
     cookieStore.set("nifes_admin_email", email, {
       path: "/",
-      sameSite: "none",
-      secure: true,
+      sameSite: isSecure ? "none" : "lax",
+      secure: isSecure,
       maxAge: 60 * 60 * 24 * 30, // 30 days
       httpOnly: false,
     });
@@ -98,20 +113,13 @@ export async function POST(req: Request) {
       path: "/",
       maxAge: 0,
       expires: new Date(0),
-      sameSite: "none",
-      secure: true,
-    });
-    res.cookies.set("nifes_logged_out", "", {
-      path: "/",
-      maxAge: 0,
-      expires: new Date(0),
-      sameSite: "lax",
-      secure: false,
+      sameSite: isSecure ? "none" : "lax",
+      secure: isSecure,
     });
     res.cookies.set("nifes_admin_email", email, {
       path: "/",
-      sameSite: "none",
-      secure: true,
+      sameSite: isSecure ? "none" : "lax",
+      secure: isSecure,
       maxAge: 60 * 60 * 24 * 30,
       httpOnly: false,
     });

@@ -1,5 +1,7 @@
 import "server-only";
 import { createHash, randomUUID } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp, type DocumentData, type DocumentReference, type Firestore } from "firebase-admin/firestore";
 
@@ -46,6 +48,42 @@ const globalForDb = globalThis as unknown as {
 const memoryStore = globalForDb.nifesMemoryStore ?? new Map<ModelName, Map<string, Row>>();
 globalForDb.nifesMemoryStore = memoryStore;
 
+const DATA_FILE_PATH = path.join(process.cwd(), "data", "store.json");
+
+function reviveDates(obj: any): any {
+  if (!obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(reviveDates);
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(v)) {
+      const parsed = new Date(v);
+      out[k] = isNaN(parsed.getTime()) ? v : parsed;
+    } else if (v && typeof v === "object") {
+      out[k] = reviveDates(v);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+export function persistMemoryStore() {
+  if (firebaseCredentialsAvailable) return;
+  try {
+    const dataDir = path.dirname(DATA_FILE_PATH);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const serialized: Record<string, Row[]> = {};
+    for (const [model, map] of memoryStore.entries()) {
+      serialized[model] = Array.from(map.values());
+    }
+    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(serialized, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to persist data store to disk:", err);
+  }
+}
+
 function initMemoryStore() {
   if (globalForDb.nifesMemoryInitialized) return;
   globalForDb.nifesMemoryInitialized = true;
@@ -53,29 +91,58 @@ function initMemoryStore() {
     if (!memoryStore.has(model)) memoryStore.set(model, new Map());
   }
 
-  const defaultEvents: Row[] = [
-    { id: "foundation-class", name: "Foundation Class", recurrence: "WEEKLY", weekday: 0, startTime: "14:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
-    { id: "sunday-service", name: "Sunday Service", recurrence: "WEEKLY", weekday: 0, startTime: "15:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
-    { id: "prayer-meeting", name: "Prayer Meeting", recurrence: "WEEKLY", weekday: 2, startTime: "17:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
-    { id: "bible-study", name: "Bible Study", recurrence: "WEEKLY", weekday: 5, startTime: "17:00", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
-    { id: "mass-evangelism", name: "Mass Evangelism", recurrence: "LAST_SATURDAY", weekday: null, startTime: "12:00", timeTBA: true, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
-  ];
-  for (const evt of defaultEvents) {
-    memoryStore.get("recurringEvent")!.set(evt.id, evt);
+  // Load from disk if available
+  if (!firebaseCredentialsAvailable && fs.existsSync(DATA_FILE_PATH)) {
+    try {
+      const raw = fs.readFileSync(DATA_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(raw);
+      for (const [model, rows] of Object.entries(parsed)) {
+        if (Array.isArray(rows) && memoryStore.has(model as ModelName)) {
+          const map = memoryStore.get(model as ModelName)!;
+          for (const row of rows) {
+            const revived = reviveDates(row);
+            if (revived && revived.id) {
+              map.set(revived.id, revived);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error loading persisted store:", e);
+    }
   }
 
+  // Ensure default recurring events exist
+  if (memoryStore.get("recurringEvent")!.size === 0) {
+    const defaultEvents: Row[] = [
+      { id: "foundation-class", name: "Foundation Class", recurrence: "WEEKLY", weekday: 0, startTime: "14:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+      { id: "sunday-service", name: "Sunday Service", recurrence: "WEEKLY", weekday: 0, startTime: "15:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+      { id: "prayer-meeting", name: "Prayer Meeting", recurrence: "WEEKLY", weekday: 2, startTime: "17:30", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+      { id: "bible-study", name: "Bible Study", recurrence: "WEEKLY", weekday: 5, startTime: "17:00", timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+      { id: "mass-evangelism", name: "Mass Evangelism", recurrence: "LAST_SATURDAY", weekday: null, startTime: "12:00", timeTBA: true, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
+    ];
+    for (const evt of defaultEvents) {
+      memoryStore.get("recurringEvent")!.set(evt.id, evt);
+    }
+  }
+
+  // Ensure primary super admin exists
   const primaryAdmin = "nscpeace1@gmail.com";
   const adminId = `admin_${createHash("sha256").update(primaryAdmin).digest("hex").slice(0, 32)}`;
-  const adminUser: Row = {
-    id: adminId,
-    email: primaryAdmin,
-    role: "SUPER_ADMIN",
-    status: "ACTIVE",
-    invitedBy: null,
-    createdAt: new Date(),
-    lastLoginAt: null,
-  };
-  memoryStore.get("adminUser")!.set(adminId, adminUser);
+  if (!memoryStore.get("adminUser")!.has(adminId)) {
+    const adminUser: Row = {
+      id: adminId,
+      email: primaryAdmin,
+      role: "SUPER_ADMIN",
+      status: "ACTIVE",
+      invitedBy: null,
+      createdAt: new Date(),
+      lastLoginAt: null,
+    };
+    memoryStore.get("adminUser")!.set(adminId, adminUser);
+  }
+
+  persistMemoryStore();
 }
 
 function firebaseOptions() {
@@ -317,6 +384,7 @@ async function createRow(model: ModelName, source: Row): Promise<Row> {
     }
     if (store.has(id)) assertUniqueError();
     store.set(id, { ...row });
+    persistMemoryStore();
     return row;
   }
   const ref = firestore.collection(collections[model]).doc(id);
@@ -359,6 +427,7 @@ async function updateRow(model: ModelName, where: Row, data: Row): Promise<Row> 
     const store = memoryStore.get(model)!;
     const updated = { ...found, ...next };
     store.set(found.id, updated);
+    persistMemoryStore();
     return updated;
   }
   const ref = firestore.collection(collections[model]).doc(found.id);
@@ -405,6 +474,7 @@ async function deleteRow(model: ModelName, where: Row): Promise<Row> {
       const attendances = memoryStore.get("attendance")!;
       for (const [k, v] of attendances) if (v.sessionId === found.id) attendances.delete(k);
     }
+    persistMemoryStore();
     return found;
   }
   if (model === "member") {
@@ -452,10 +522,13 @@ function createModel(model: ModelName): any {
           const current = store.get(year);
           const row = current ? { ...current, nextValue: current.nextValue + Number(update.nextValue?.increment ?? 0) } : defaults(model, create);
           store.set(year, row);
+          persistMemoryStore();
           return project(model, row, { select, include });
         }
         const current = (await findRows(model, { where, take: 1 }))[0];
-        return project(model, current ? await updateRow(model, where, update) : await createRow(model, create), { select, include });
+        const res = project(model, current ? await updateRow(model, where, update) : await createRow(model, create), { select, include });
+        persistMemoryStore();
+        return res;
       }
       if (model === "memberSequence") {
         const year = String(create.year ?? where.year);
@@ -509,8 +582,6 @@ db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: num
 
 export const PRIMARY_ADMIN_EMAIL = "nscpeace1@gmail.com";
 
-let initialPurgeExecuted = false;
-
 export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCount: number }> {
   let deletedCount = 0;
   const primaryEmail = PRIMARY_ADMIN_EMAIL;
@@ -535,6 +606,7 @@ export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCou
       createdAt: new Date(),
       lastLoginAt: null,
     });
+    persistMemoryStore();
   }
 
   // 2. Purge from Firestore if credentials are active
@@ -570,8 +642,7 @@ export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCou
 }
 
 export async function ensureInitialAuthorizationPurge(): Promise<void> {
-  if (initialPurgeExecuted) return;
-  initialPurgeExecuted = true;
-  await clearAllAuthorizedExceptSuperAdmin();
+  // Retain authorized emails permanently; do not purge.
+  return;
 }
 

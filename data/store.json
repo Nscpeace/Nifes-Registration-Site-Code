@@ -1,0 +1,93 @@
+{
+  "member": [],
+  "adminUser": [
+    {
+      "id": "admin_4ab94c426c704d3236961397aaf0533a",
+      "email": "nscpeace1@gmail.com",
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "invitedBy": null,
+      "createdAt": "2026-10-09T20:36:36.814Z",
+      "lastLoginAt": null
+    }
+  ],
+  "recurringEvent": [
+    {
+      "id": "foundation-class",
+      "name": "Foundation Class",
+      "recurrence": "WEEKLY",
+      "weekday": 0,
+      "startTime": "14:30",
+      "timeTBA": false,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "checkInOpensMinutes": 60,
+      "checkInClosesMinutes": 120
+    },
+    {
+      "id": "sunday-service",
+      "name": "Sunday Service",
+      "recurrence": "WEEKLY",
+      "weekday": 0,
+      "startTime": "15:30",
+      "timeTBA": false,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "checkInOpensMinutes": 60,
+      "checkInClosesMinutes": 120
+    },
+    {
+      "id": "prayer-meeting",
+      "name": "Prayer Meeting",
+      "recurrence": "WEEKLY",
+      "weekday": 2,
+      "startTime": "17:30",
+      "timeTBA": false,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "checkInOpensMinutes": 60,
+      "checkInClosesMinutes": 120
+    },
+    {
+      "id": "bible-study",
+      "name": "Bible Study",
+      "recurrence": "WEEKLY",
+      "weekday": 5,
+      "startTime": "17:00",
+      "timeTBA": false,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "checkInOpensMinutes": 60,
+      "checkInClosesMinutes": 120
+    },
+    {
+      "id": "mass-evangelism",
+      "name": "Mass Evangelism",
+      "recurrence": "LAST_SATURDAY",
+      "weekday": null,
+      "startTime": "12:00",
+      "timeTBA": true,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "checkInOpensMinutes": 60,
+      "checkInClosesMinutes": 120
+    }
+  ],
+  "session": [],
+  "attendance": [],
+  "followUp": [],
+  "auditLog": [
+    {
+      "details": {
+        "email": "sistermary@gmail.com",
+        "role": "ADMIN"
+      },
+      "createdAt": "2026-10-09T20:37:43.584Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_INVITED",
+      "id": "f05709c5-8207-4461-ae3c-9fdf066197d0"
+    }
+  ],
+  "rateLimit": [],
+  "memberSequence": []
+}

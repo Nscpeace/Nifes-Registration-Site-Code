@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { db, PRIMARY_ADMIN_EMAIL, clearAllAuthorizedExceptSuperAdmin, ensureInitialAuthorizationPurge } from "@/lib/db";
+import { db, PRIMARY_ADMIN_EMAIL, clearAllAuthorizedExceptSuperAdmin } from "@/lib/db";
 
 export type AdminSession = {
   user: {
@@ -16,9 +16,6 @@ export type AdminSession = {
 export async function isEmailAuthorized(
   email: string
 ): Promise<{ authorized: boolean; role?: string; status?: string }> {
-  // Ensure the legacy list purge has executed
-  await ensureInitialAuthorizationPurge();
-
   const normalized = email.trim().toLowerCase();
   if (normalized === PRIMARY_ADMIN_EMAIL) {
     return { authorized: true, role: "SUPER_ADMIN", status: "ACTIVE" };
@@ -42,8 +39,6 @@ export async function resolveAdminSession(
   queryAdminEmail?: string,
   req?: Request
 ): Promise<AdminSession | null> {
-  await ensureInitialAuthorizationPurge();
-
   // 1. Check logged-out state first
   let cookieEmail: string | undefined;
   let isLoggedOut = false;
