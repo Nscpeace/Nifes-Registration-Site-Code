@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/access";
 import { db } from "@/lib/db";
-import { signOut } from "@/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -82,15 +81,33 @@ export default async function Admin({
             action={async () => {
               "use server";
               const cookieStore = await cookies();
-              cookieStore.delete("nifes_admin_email");
+              const cookieNames = [
+                "nifes_admin_email",
+                "authjs.session-token",
+                "__Secure-authjs.session-token",
+                "next-auth.session-token",
+                "__Secure-next-auth.session-token",
+                "authjs.csrf-token",
+                "authjs.callback-url",
+              ];
+              for (const name of cookieNames) {
+                try {
+                  cookieStore.delete(name);
+                  cookieStore.set(name, "", {
+                    path: "/",
+                    maxAge: 0,
+                    expires: new Date(0),
+                    sameSite: "none",
+                    secure: true,
+                  });
+                } catch {}
+              }
               cookieStore.set("nifes_logged_out", "1", {
                 path: "/",
                 sameSite: "none",
                 secure: true,
+                maxAge: 60 * 60 * 24 * 7,
               });
-              try {
-                await signOut({ redirect: false });
-              } catch {}
               redirect("/admin/login");
             }}
           >

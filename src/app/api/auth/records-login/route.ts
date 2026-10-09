@@ -3,20 +3,41 @@ import { cookies } from "next/headers";
 import { db, PRIMARY_ADMIN_EMAIL } from "@/lib/db";
 import { isEmailAuthorized } from "@/lib/access";
 
+const RECORDS_PORTAL_PASSWORD = "NIFES#2026";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const rawEmail = typeof body.email === "string" ? body.email : "";
-    const email = rawEmail.trim().toLowerCase();
+    const rawPassword = typeof body.password === "string" ? body.password : "";
 
-    if (!email) {
+    const email = rawEmail.trim().toLowerCase() || PRIMARY_ADMIN_EMAIL;
+    const password = rawPassword.trim();
+
+    // 1. Strict Password Verification
+    if (!password) {
       return NextResponse.json(
-        { ok: false, error: "empty", message: "Please enter your email address." },
+        {
+          ok: false,
+          error: "missing_password",
+          message: "Access password is required.",
+        },
         { status: 200 }
       );
     }
 
-    // Strict authorization check: only nscpeace1@gmail.com and emails he authorized
+    if (password !== RECORDS_PORTAL_PASSWORD) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "invalid_password",
+          message: "Incorrect password. Please enter the valid portal password.",
+        },
+        { status: 200 }
+      );
+    }
+
+    // 2. Strict authorization check: must be nscpeace1@gmail.com or an authorized email
     const authStatus = await isEmailAuthorized(email);
 
     if (!authStatus.authorized) {
@@ -31,7 +52,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Provision or activate primary admin if needed
+    // 3. Provision or activate primary admin if needed
     let admin = await db.adminUser.findUnique({ where: { email } });
     if (!admin && email === PRIMARY_ADMIN_EMAIL) {
       admin = await db.adminUser.create({
@@ -49,7 +70,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // Set authentication cookies
+    // 4. Set authentication cookies
     const cookieStore = await cookies();
     cookieStore.delete("nifes_logged_out");
     cookieStore.set("nifes_logged_out", "", {

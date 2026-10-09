@@ -17,19 +17,18 @@ export default function RecordsSignOutButton() {
       console.error("Sign out error:", e);
     }
 
-    try {
-      // 2. Also notify NextAuth signout handler if available
-      await fetch("/api/auth/signout", {
-        method: "POST",
-      }).catch(() => {});
-    } catch {}
-
-    // 3. Client-side cookie cleanup as immediate local protection
+    // 2. Client-side cookie cleanup as immediate local protection
     try {
       document.cookie =
         "nifes_admin_email=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
       document.cookie =
         "nifes_admin_email=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie =
+        "authjs.session-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
+      document.cookie =
+        "authjs.session-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie =
+        "__Secure-authjs.session-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
       document.cookie =
         "nifes_logged_out=1; path=/; max-age=604800; SameSite=None; Secure";
       document.cookie =

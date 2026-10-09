@@ -88,11 +88,8 @@ export async function resolveAdminSession(
     // Proceed to cookie verification
   }
 
-  // Candidate email must come from verified cookie (or explicit authorized query in API calls)
-  let candidateEmail = cookieEmail;
-  if (!candidateEmail && queryAdminEmail) {
-    candidateEmail = queryAdminEmail.trim().toLowerCase();
-  }
+  // Candidate email must come from verified session cookie (authenticated with password)
+  const candidateEmail = cookieEmail;
 
   if (!candidateEmail) {
     return null;
