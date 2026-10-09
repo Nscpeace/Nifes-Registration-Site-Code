@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { resolveAdminSession, isEmailAuthorized } from "@/lib/access";
+import { resolveAdminSession } from "@/lib/access";
 import { db } from "@/lib/db";
 import RecordsClient, { type AttendanceItem, type AuthorizedUser } from "./records-client";
+import RecordsLoginCard from "./records-login-card";
+import RecordsSignOutButton from "./records-signout";
 import { type Member } from "@/app/admin/members/table";
 
 export const dynamic = "force-dynamic";
@@ -11,244 +12,43 @@ export const dynamic = "force-dynamic";
 export default async function MemberRecordsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ admin?: string; login?: string; error?: string; attempted?: string }>;
+  searchParams?: Promise<{ admin?: string; login?: string; error?: string; attempted?: string; logout?: string; t?: string }>;
 }) {
   const params = (await searchParams) || {};
-  const queryAdmin = params.admin?.trim().toLowerCase();
   const attemptedEmail = params.attempted?.trim();
   const isUnauthorizedError = params.error === "unauthorized";
+  const forceLoggedOut = params.login === "1" || params.logout === "1";
 
-  // Server action to log in with an authorized email
-  async function verifyAndSignIn(formData: FormData) {
-    "use server";
-    const emailInput = (formData.get("email")?.toString() || "").trim().toLowerCase();
-
-    if (!emailInput) {
-      redirect("/records?error=unauthorized&attempted=empty");
-    }
-
-    // Check authorization: only nscpeace1@gmail.com and emails he authorized
-    const authStatus = await isEmailAuthorized(emailInput);
-
-    if (!authStatus.authorized) {
-      // Access Denied!
-      redirect(`/records?error=unauthorized&attempted=${encodeURIComponent(emailInput)}`);
-    }
-
-    // Email is authorized: provision if primary super admin, ensure status ACTIVE
-    let admin = await db.adminUser.findUnique({ where: { email: emailInput } });
-    if (!admin && emailInput === "nscpeace1@gmail.com") {
-      admin = await db.adminUser.create({
-        data: {
-          email: emailInput,
-          role: "SUPER_ADMIN",
-          status: "ACTIVE",
-          invitedBy: null,
-        },
+  // If sign-out or explicit login portal is requested, immediately invalidate session & render login card
+  if (forceLoggedOut) {
+    try {
+      const cookieStore = await cookies();
+      cookieStore.delete("nifes_admin_email");
+      cookieStore.set("nifes_logged_out", "1", {
+        path: "/",
+        sameSite: "none",
+        secure: true,
+        maxAge: 60 * 60 * 24 * 7,
       });
-    } else if (admin && admin.status === "INVITED") {
-      await db.adminUser.update({
-        where: { email: emailInput },
-        data: { status: "ACTIVE" },
-      });
-    }
-
-    const c = await cookies();
-    c.delete("nifes_logged_out");
-    c.set("nifes_admin_email", emailInput, {
-      path: "/",
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      httpOnly: false,
-    });
-
-    redirect("/records");
-  }
-
-  // Server action to log out
-  async function adminSignOut() {
-    "use server";
-    const c = await cookies();
-    c.delete("nifes_admin_email");
-    c.set("nifes_logged_out", "1", { path: "/", maxAge: 60 * 60 });
-    redirect("/records?login=1");
+    } catch {}
+    return (
+      <RecordsLoginCard
+        initialAttemptedEmail={attemptedEmail}
+        initialIsUnauthorized={isUnauthorizedError}
+      />
+    );
   }
 
   // Resolve admin session strictly via verified session/cookie (prevent URL spoofing)
   const session = await resolveAdminSession(["SUPER_ADMIN", "ADMIN"]);
 
-  // If NOT authorized, render the restricted access screen (NO records exposed)
+  // If NOT authorized, render the interactive restricted access screen
   if (!session) {
     return (
-      <main
-        className="wrap page"
-        style={{
-          minHeight: "88vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "30px 16px",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <Link
-            href="/"
-            className="brand"
-            style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}
-          >
-            <img
-              src="/nifes-logo.jpg"
-              alt="NIFES UNIBEN Logo"
-              width="44"
-              height="44"
-              style={{ borderRadius: "50%", border: "2px solid rgba(255,255,255,0.2)" }}
-            />
-            <span style={{ fontWeight: 800, color: "#f8fafc", fontSize: "1.1rem" }}>
-              ← NIFES UNIBEN
-            </span>
-          </Link>
-        </div>
-
-        <section
-          className="formcard"
-          style={{
-            maxWidth: 500,
-            margin: "0 auto",
-            width: "100%",
-            padding: "36px 28px",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-            <div
-              style={{
-                width: 76,
-                height: 76,
-                borderRadius: "50%",
-                padding: 3,
-                background: "linear-gradient(135deg, #2b8cee, #ec3b83)",
-                boxShadow: "0 8px 24px rgba(43, 140, 238, 0.35)",
-              }}
-            >
-              <img
-                src="/nifes-logo.jpg"
-                alt="NIFES UNIBEN Logo"
-                width="70"
-                height="70"
-                style={{ borderRadius: "50%", display: "block" }}
-              />
-            </div>
-          </div>
-
-          <div
-            className="eyebrow"
-            style={{
-              color: "#3da6f5",
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
-          >
-            Authorized Access Only
-          </div>
-          <h1 style={{ fontSize: "1.85rem", margin: "6px 0 8px", fontWeight: 800 }}>
-            Member's Records Portal
-          </h1>
-          <p className="muted" style={{ margin: "0 0 20px", fontSize: "0.9rem", lineHeight: 1.5 }}>
-            Access to member records is strictly restricted to administrator{" "}
-            <strong style={{ color: "#3da6f5" }}>nscpeace1@gmail.com</strong> and emails he authorizes.
-          </p>
-
-          {/* Access Denied Alert if an unauthorized email attempted login */}
-          {isUnauthorizedError && attemptedEmail && (
-            <div
-              className="error"
-              role="alert"
-              style={{
-                marginBottom: 20,
-                padding: "14px 16px",
-                borderRadius: 12,
-                textAlign: "left",
-                fontSize: "0.88rem",
-              }}
-            >
-              <strong style={{ display: "block", marginBottom: 4, color: "#fca5a5" }}>
-                ⛔ Access Denied
-              </strong>
-              <span>
-                <strong>{attemptedEmail}</strong> has not been authorized by administrator{" "}
-                <strong>nscpeace1@gmail.com</strong>.
-              </span>
-              <p style={{ margin: "6px 0 0", fontSize: "0.8rem", color: "#fecaca" }}>
-                Please ask <strong>nscpeace1@gmail.com</strong> to grant your email access from the authorized admin panel.
-              </p>
-            </div>
-          )}
-
-          {/* Verification Form */}
-          <form action={verifyAndSignIn} style={{ textAlign: "left", marginBottom: 20 }}>
-            <div className="field" style={{ marginBottom: 14 }}>
-              <label
-                htmlFor="admin-email"
-                style={{
-                  fontSize: "0.88rem",
-                  fontWeight: 600,
-                  display: "block",
-                  marginBottom: 6,
-                }}
-              >
-                Enter your authorized email address
-              </label>
-              <input
-                id="admin-email"
-                name="email"
-                type="email"
-                required
-                placeholder="nscpeace1@gmail.com or authorized email"
-                autoComplete="email"
-                style={{ width: "100%", padding: "12px 14px", fontSize: "1rem", borderRadius: 10 }}
-              />
-              <p style={{ margin: "6px 0 0", fontSize: "0.76rem", color: "#94a3b8" }}>
-                The email must be <strong>nscpeace1@gmail.com</strong> or added by him.
-              </p>
-            </div>
-
-            <button
-              className="button button-primary"
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "12px",
-                fontSize: "0.98rem",
-                fontWeight: 700,
-                borderRadius: 10,
-              }}
-            >
-              Verify & Access Member Records →
-            </button>
-          </form>
-
-          <div
-            style={{
-              borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-              paddingTop: 16,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontSize: "0.82rem",
-            }}
-          >
-            <Link href="/check-in" style={{ color: "#3da6f5", textDecoration: "underline" }}>
-              ← Fellowship Check-in
-            </Link>
-            <Link href="/#register" style={{ color: "#ec3b83", textDecoration: "underline" }}>
-              Register as Member →
-            </Link>
-          </div>
-        </section>
-      </main>
+      <RecordsLoginCard
+        initialAttemptedEmail={attemptedEmail}
+        initialIsUnauthorized={isUnauthorizedError}
+      />
     );
   }
 
@@ -388,15 +188,7 @@ export default async function MemberRecordsPage({
             </span>
           </div>
 
-          <form action={adminSignOut}>
-            <button
-              className="btn ghost"
-              type="submit"
-              style={{ padding: "6px 12px", fontSize: "0.8rem", color: "#fca5a5" }}
-            >
-              Sign Out
-            </button>
-          </form>
+          <RecordsSignOutButton />
         </div>
       </div>
 

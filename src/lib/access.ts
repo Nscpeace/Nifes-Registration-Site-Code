@@ -44,7 +44,29 @@ export async function resolveAdminSession(
 ): Promise<AdminSession | null> {
   await ensureInitialAuthorizationPurge();
 
-  // 1. Try NextAuth session
+  // 1. Check logged-out state first
+  let cookieEmail: string | undefined;
+  let isLoggedOut = false;
+
+  try {
+    const cookieStore = await cookies();
+    cookieEmail = cookieStore.get("nifes_admin_email")?.value?.trim().toLowerCase();
+    isLoggedOut = cookieStore.get("nifes_logged_out")?.value === "1";
+  } catch {
+    if (req) {
+      const cookieHeader = req.headers.get("cookie") || "";
+      const match = cookieHeader.match(/nifes_admin_email=([^;]+)/);
+      if (match) cookieEmail = decodeURIComponent(match[1]).trim().toLowerCase();
+      isLoggedOut = cookieHeader.includes("nifes_logged_out=1");
+    }
+  }
+
+  // If user explicitly signed out, do not resolve session
+  if (isLoggedOut) {
+    return null;
+  }
+
+  // 2. Try NextAuth session (only if not logged out)
   try {
     const session = await auth();
     if (session?.user?.email) {
@@ -64,27 +86,6 @@ export async function resolveAdminSession(
     }
   } catch {
     // Proceed to cookie verification
-  }
-
-  // 2. Cookie verification
-  let cookieEmail: string | undefined;
-  let isLoggedOut = false;
-
-  try {
-    const cookieStore = await cookies();
-    cookieEmail = cookieStore.get("nifes_admin_email")?.value?.trim().toLowerCase();
-    isLoggedOut = cookieStore.get("nifes_logged_out")?.value === "1";
-  } catch {
-    if (req) {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const match = cookieHeader.match(/nifes_admin_email=([^;]+)/);
-      if (match) cookieEmail = decodeURIComponent(match[1]).trim().toLowerCase();
-      isLoggedOut = cookieHeader.includes("nifes_logged_out=1");
-    }
-  }
-
-  if (isLoggedOut) {
-    return null;
   }
 
   // Candidate email must come from verified cookie (or explicit authorized query in API calls)

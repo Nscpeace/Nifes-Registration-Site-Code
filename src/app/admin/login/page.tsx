@@ -26,18 +26,24 @@ export default async function Login({
   async function loginAsAdmin(emailToLogin: string) {
     "use server";
     const email = emailToLogin.trim().toLowerCase();
+    const { isEmailAuthorized } = await import("@/lib/access");
+    const authStatus = await isEmailAuthorized(email);
+    if (!authStatus.authorized) {
+      redirect(`/admin/login?error=unauthorized`);
+    }
+
     const cookieStore = await cookies();
     cookieStore.delete("nifes_logged_out");
     cookieStore.set("nifes_admin_email", email, {
       path: "/",
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 30, // 30 days
       httpOnly: false,
     });
 
     let admin = await db.adminUser.findUnique({ where: { email } });
-    if (!admin && (email === "nscpeace1@gmail.com" || email === (process.env.SUPER_ADMIN_EMAIL || "").toLowerCase())) {
+    if (!admin && email === "nscpeace1@gmail.com") {
       admin = await db.adminUser.create({
         data: {
           email,
