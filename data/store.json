@@ -1,5 +1,23 @@
 {
-  "member": [],
+  "member": [
+    {
+      "guest": false,
+      "email": "nkezechibuikem123@gmail.com",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "level": "L300",
+      "consentGivenAt": "2026-10-10T01:48:28.893Z",
+      "createdAt": "2026-10-10T01:48:28.893Z",
+      "memberId": "NIFES-2026-0001",
+      "firstName": "Shalom",
+      "lastName": "Nleze",
+      "gender": "Male",
+      "firstTimer": true,
+      "phone": "+2347040149267",
+      "id": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67"
+    }
+  ],
   "adminUser": [
     {
       "id": "admin_4ab94c426c704d3236961397aaf0533a",
@@ -9,6 +27,24 @@
       "invitedBy": null,
       "createdAt": "2026-10-09T20:36:36.814Z",
       "lastLoginAt": null
+    },
+    {
+      "role": "USHER",
+      "status": "ACTIVE",
+      "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-10T01:45:40.295Z",
+      "lastLoginAt": null,
+      "email": "nkezechibuikem123@gmail.com",
+      "id": "admin_33d53392567b7440a624c8af29eb811b"
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-10T01:45:49.077Z",
+      "lastLoginAt": null,
+      "email": "nscpeace2@gmail.com",
+      "id": "admin_19debf2c79e8a9164c45326537e9ba6d"
     }
   ],
   "recurringEvent": [
@@ -73,7 +109,71 @@
       "checkInClosesMinutes": 120
     }
   ],
-  "session": [],
+  "session": [
+    {
+      "eventId": "foundation-class",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "name": "Foundation Class",
+      "startsAt": "2026-10-11T13:30:00.000Z",
+      "id": "b000312e-6667-4648-aeb0-fea7ae06ebec"
+    },
+    {
+      "eventId": "sunday-service",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "name": "Sunday Service",
+      "startsAt": "2026-10-11T14:30:00.000Z",
+      "id": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
+    },
+    {
+      "eventId": "prayer-meeting",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "name": "Prayer Meeting",
+      "startsAt": "2026-10-13T16:30:00.000Z",
+      "id": "be057f6a-6919-47e9-90fd-1092ff243ed0"
+    },
+    {
+      "eventId": "bible-study",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "name": "Bible Study",
+      "startsAt": "2026-10-09T16:00:00.000Z",
+      "id": "81d35814-d3b3-4525-a190-695e3fdbf4a8"
+    },
+    {
+      "eventId": "bible-study",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "name": "Bible Study",
+      "startsAt": "2026-10-16T16:00:00.000Z",
+      "id": "0bd446b6-8409-4984-8f16-6bc310c23204"
+    },
+    {
+      "eventId": "mass-evangelism",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall & Campus",
+      "active": true,
+      "name": "Mass Evangelism",
+      "startsAt": "2026-10-10T01:32:14.198Z",
+      "id": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80"
+    },
+    {
+      "eventId": "mass-evangelism",
+      "endsAt": null,
+      "venue": "FAGCOOP Multipurpose Hall & Campus",
+      "active": true,
+      "name": "Mass Evangelism",
+      "startsAt": "2026-10-10T02:59:23.910Z",
+      "id": "7ee0bba9-33fc-45ce-b044-e4cf36a73afe"
+    }
+  ],
   "attendance": [],
   "followUp": [],
   "auditLog": [
@@ -86,8 +186,35 @@
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "ACCESS_INVITED",
       "id": "f05709c5-8207-4461-ae3c-9fdf066197d0"
+    },
+    {
+      "details": {
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "USHER"
+      },
+      "createdAt": "2026-10-10T01:45:40.296Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_INVITED",
+      "id": "3b27ed30-0efd-414e-9ecd-56d0a83cb3d2"
+    },
+    {
+      "details": {
+        "email": "nscpeace2@gmail.com",
+        "role": "SUPER_ADMIN"
+      },
+      "createdAt": "2026-10-10T01:45:49.078Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_INVITED",
+      "id": "ec56177d-5b9a-4348-8a35-4d5796988698"
     }
   ],
-  "rateLimit": [],
+  "rateLimit": [
+    {
+      "id": "register:be715a44aa8235e285a81cebe693122e763764e2b2a946dee2e0eebe6c6489f2",
+      "key": "register:be715a44aa8235e285a81cebe693122e763764e2b2a946dee2e0eebe6c6489f2",
+      "hits": 1,
+      "resetAt": "2026-10-10T02:48:28.888Z"
+    }
+  ],
   "memberSequence": []
 }

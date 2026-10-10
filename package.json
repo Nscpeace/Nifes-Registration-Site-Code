@@ -13,6 +13,7 @@
     "db:seed": "node --env-file-if-exists=.env.local --import=tsx scripts/seed.ts"
   },
   "dependencies": {
+    "firebase": "^13.0.0",
     "firebase-admin": "^14.5.0",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.54.0",

@@ -1,8 +1,88 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Default deny catch-all
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    // Health check / connection test
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // Registered members
+    match /members/{memberId} {
+      allow read: if true;
+      allow create: if isValidId(memberId)
+                    && incoming().firstName is string && incoming().firstName.size() <= 100
+                    && incoming().lastName is string && incoming().lastName.size() <= 100
+                    && incoming().phone is string && incoming().phone.size() <= 40;
+      allow update, delete: if isValidId(memberId);
+    }
+
+    // Member unique constraints (phone and email hash indexes)
+    match /member_unique_keys/{key} {
+      allow read, write: if true;
+    }
+
+    // Admin users
+    match /admin_users/{adminId} {
+      allow read: if true;
+      allow write: if isValidId(adminId);
+    }
+
+    // Recurring events
+    match /recurring_events/{eventId} {
+      allow read: if true;
+      allow write: if isValidId(eventId);
+    }
+
+    // Service sessions
+    match /sessions/{sessionId} {
+      allow read: if true;
+      allow write: if isValidId(sessionId);
+    }
+
+    // Attendance records
+    match /attendance/{attendanceId} {
+      allow read: if true;
+      allow create: if isValidId(attendanceId)
+                    && incoming().memberId is string
+                    && incoming().sessionId is string;
+      allow update, delete: if isValidId(attendanceId);
+    }
+
+    // First timer follow-up tracking
+    match /follow_ups/{followUpId} {
+      allow read: if true;
+      allow write: if isValidId(followUpId);
+    }
+
+    // Audit logs
+    match /audit_logs/{logId} {
+      allow read: if true;
+      allow create: if isValidId(logId);
+      allow update, delete: if false;
+    }
+
+    // Member ID sequence counters
+    match /member_sequences/{year} {
+      allow read, write: if true;
+    }
+
+    // Rate limits
+    match /rate_limits/{limitKey} {
+      allow read, write: if true;
     }
   }
 }

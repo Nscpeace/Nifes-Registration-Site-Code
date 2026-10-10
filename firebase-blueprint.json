@@ -1,0 +1,137 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "Fellowship registered member record",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "maxLength": 64, "description": "Unique NIFES membership code" },
+        "firstName": { "type": "string", "maxLength": 80, "description": "Member first name" },
+        "lastName": { "type": "string", "maxLength": 80, "description": "Member last name" },
+        "gender": { "type": "string", "enum": ["Male", "Female"], "description": "Gender" },
+        "email": { "type": "string", "format": "email", "maxLength": 254, "description": "Email address" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Phone number" },
+        "placeOfResidence": { "type": "string", "maxLength": 150, "description": "Residence or hostel" },
+        "heardAbout": { "type": "string", "enum": ["Friend", "WhatsApp", "Instagram", "Flier", "Other"], "description": "Referral source" },
+        "heardAboutOther": { "type": "string", "maxLength": 200, "description": "Custom referral details" },
+        "firstTimer": { "type": "boolean", "description": "Is this their first time attending" },
+        "level": { "type": "string", "enum": ["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE", "NON_STUDENT"], "description": "Academic level or student status" },
+        "guest": { "type": "boolean", "description": "Guest status" },
+        "consentGivenAt": { "type": "string", "format": "date-time", "description": "Timestamp of data consent" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["memberId", "firstName", "lastName", "gender", "phone", "firstTimer"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized fellowship administrator account",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "maxLength": 254, "description": "Admin email" },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "ADMIN", "USHER"], "description": "Role authorization" },
+        "status": { "type": "string", "enum": ["ACTIVE", "INVITED", "DISABLED"], "description": "Account status" },
+        "invitedBy": { "type": "string", "description": "Admin ID of inviter" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation date" },
+        "lastLoginAt": { "type": "string", "format": "date-time", "description": "Last sign in timestamp" }
+      },
+      "required": ["email", "role", "status"]
+    },
+    "RecurringEvent": {
+      "title": "RecurringEvent",
+      "description": "Recurring weekly programme definition",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100, "description": "Event name" },
+        "recurrence": { "type": "string", "maxLength": 50, "description": "Recurrence cadence" },
+        "weekday": { "type": "number", "description": "Day of week 0-6" },
+        "startTime": { "type": "string", "maxLength": 10, "description": "Start time HH:MM" },
+        "timeTBA": { "type": "boolean", "description": "Is time to be announced" },
+        "venue": { "type": "string", "maxLength": 150, "description": "Event venue" },
+        "active": { "type": "boolean", "description": "Active state" },
+        "checkInOpensMinutes": { "type": "number", "description": "Minutes before event check-in opens" },
+        "checkInClosesMinutes": { "type": "number", "description": "Minutes after event check-in closes" }
+      },
+      "required": ["name", "recurrence", "venue", "active"]
+    },
+    "Session": {
+      "title": "Session",
+      "description": "Individual service meeting session",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 120, "description": "Session title" },
+        "eventId": { "type": "string", "description": "Associated recurring event ID" },
+        "startsAt": { "type": "string", "format": "date-time", "description": "Session start timestamp" },
+        "endsAt": { "type": "string", "format": "date-time", "description": "Session end timestamp" },
+        "venue": { "type": "string", "maxLength": 150, "description": "Venue" },
+        "active": { "type": "boolean", "description": "Active for check-in" }
+      },
+      "required": ["name", "venue", "active"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Individual check-in log",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "description": "Member document ID" },
+        "sessionId": { "type": "string", "description": "Session document ID" },
+        "checkedInAt": { "type": "string", "format": "date-time", "description": "Check-in time" },
+        "method": { "type": "string", "enum": ["SELF", "USHER", "MANUAL", "QR"], "description": "Check-in method" }
+      },
+      "required": ["memberId", "sessionId", "method"]
+    },
+    "FollowUp": {
+      "title": "FollowUp",
+      "description": "First timer follow up note and status",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "description": "Member document ID" },
+        "status": { "type": "string", "enum": ["NOT_CONTACTED", "CONTACTED", "INTEGRATED", "UNREACHABLE"], "description": "Follow up progress" },
+        "notes": { "type": "string", "maxLength": 1000, "description": "Counseling and follow-up notes" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated" }
+      },
+      "required": ["memberId", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security audit record",
+      "type": "object",
+      "properties": {
+        "adminId": { "type": "string", "description": "Admin ID who performed action" },
+        "action": { "type": "string", "maxLength": 80, "description": "Action name" },
+        "details": { "type": "string", "description": "JSON details string" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Log timestamp" }
+      },
+      "required": ["action", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/members/{memberId}": {
+      "schema": "#/entities/Member",
+      "description": "Registered fellowship members"
+    },
+    "/admin_users/{adminId}": {
+      "schema": "#/entities/AdminUser",
+      "description": "Authorized fellowship administrators"
+    },
+    "/recurring_events/{eventId}": {
+      "schema": "#/entities/RecurringEvent",
+      "description": "Weekly fellowship programs and meetings"
+    },
+    "/sessions/{sessionId}": {
+      "schema": "#/entities/Session",
+      "description": "Service session records"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "#/entities/Attendance",
+      "description": "Service session check-in logs"
+    },
+    "/follow_ups/{memberId}": {
+      "schema": "#/entities/FollowUp",
+      "description": "First timer follow-up tracking"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "#/entities/AuditLog",
+      "description": "Audit trail entries"
+    }
+  }
+}
