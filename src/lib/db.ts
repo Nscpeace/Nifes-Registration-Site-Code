@@ -618,14 +618,14 @@ db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: num
   });
 };
 
-export const DEFAULT_SUPER_ADMIN_EMAILS: string[] = ["nscpeace1@gmail.com", "nscpeace2@gmail.com"];
+export const DEFAULT_SUPER_ADMIN_EMAILS: string[] = ["nscpeace1@gmail.com"];
 
 export const PRIMARY_ADMIN_EMAIL = "nscpeace1@gmail.com";
 
 export function isDefaultSuperAdmin(email?: string | null): boolean {
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
-  return DEFAULT_SUPER_ADMIN_EMAILS.includes(normalized);
+  return normalized === PRIMARY_ADMIN_EMAIL;
 }
 
 export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCount: number }> {

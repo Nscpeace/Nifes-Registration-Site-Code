@@ -14,7 +14,7 @@ export type Member = {
   heardAbout: "Friend" | "WhatsApp" | "Instagram" | "Flier" | "Other" | null;
   heardAboutOther: string | null;
   firstTimer: boolean;
-  level: "L100" | "L200" | "L300" | "L400" | "L500" | "L600" | "POSTGRADUATE" | null;
+  level: "L100" | "L200" | "L300" | "L400" | "L500" | "L600" | "POSTGRADUATE" | "NON_STUDENT" | null;
   guest: boolean;
   createdAt: string;
 };
@@ -127,8 +127,8 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
           Level
           <select className="dropdown-animated" value={level} onChange={(e) => setLevel(e.target.value)}>
             <option value="">All</option>
-            {["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE"].map((x) => (
-              <option key={x}>{x}</option>
+            {["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE", "NON_STUDENT"].map((x) => (
+              <option key={x} value={x}>{x === "NON_STUDENT" ? "Not a Student" : x}</option>
             ))}
           </select>
         </label>
@@ -195,7 +195,11 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
                   <small style={{ display: "block", color: "#85aed3" }}>{m.phone}</small>
                 </td>
                 <td>{m.placeOfResidence || "—"}</td>
-                <td>{m.level || "—"}</td>
+                <td>
+                  <span className={`pill ${m.level === "NON_STUDENT" ? "" : "blue"}`} style={{ fontSize: "0.75rem" }}>
+                    {m.level === "NON_STUDENT" ? "Not a Student" : m.level || "—"}
+                  </span>
+                </td>
                 <td>
                   {m.heardAbout ? `${m.heardAbout}${m.heardAboutOther ? `: ${m.heardAboutOther}` : ""}` : "—"}
                 </td>
@@ -240,8 +244,8 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
                         Level
                         <select name="level" defaultValue={m.level || ""} className="dropdown-animated">
                           <option value="">Not provided</option>
-                          {["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE"].map((x) => (
-                            <option key={x}>{x}</option>
+                          {["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE", "NON_STUDENT"].map((x) => (
+                            <option key={x} value={x}>{x === "NON_STUDENT" ? "Not a Student" : x}</option>
                           ))}
                         </select>
                       </label>

@@ -19,7 +19,7 @@ export default async function Login({
 
   // If already authenticated and not explicitly logged out, forward to destination
   if ((session?.user?.adminId || cookieEmail) && !isLoggedOut) {
-    const adminParam = session?.user?.email || cookieEmail || "nkezechibuikem123@gmail.com";
+    const adminParam = session?.user?.email || cookieEmail || "nscpeace1@gmail.com";
     redirect(`${destination}${destination.includes("?") ? "&" : "?"}admin=${encodeURIComponent(adminParam)}`);
   }
 
@@ -107,51 +107,34 @@ export default async function Login({
           </p>
         )}
 
-        {/* Primary 1-Click Fast Access for Main Super Admins */}
+        {/* Primary 1-Click Fast Access for Main Super Admin nscpeace1@gmail.com */}
         <div style={{ background: "rgba(39, 139, 245, 0.14)", border: "1.5px solid rgba(39, 139, 245, 0.4)", borderRadius: 16, padding: "20px 18px", marginBottom: 24, textAlign: "left" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ fontSize: "1.2rem" }}>🔑</span>
             <div>
               <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#93c5fd" }}>
-                Super Admin Quick Access
+                Main Super Admin Access
               </p>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "#cbd5e1" }}>
-                Main Administrators: <strong>nscpeace1@gmail.com</strong> / <strong>nscpeace2@gmail.com</strong>
+                Main Administrator: <strong>nscpeace1@gmail.com</strong>
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <form
-              action={async () => {
-                "use server";
-                await loginAsAdmin("nscpeace1@gmail.com");
-              }}
+          <form
+            action={async () => {
+              "use server";
+              await loginAsAdmin("nscpeace1@gmail.com");
+            }}
+          >
+            <button
+              type="submit"
+              className="button button-primary"
+              style={{ width: "100%", padding: "13px", fontWeight: 800, fontSize: "1rem", boxShadow: "0 6px 20px rgba(43, 140, 238, 0.4)" }}
             >
-              <button
-                type="submit"
-                className="button button-primary"
-                style={{ width: "100%", padding: "12px", fontWeight: 800, fontSize: "0.95rem", boxShadow: "0 6px 20px rgba(43, 140, 238, 0.4)" }}
-              >
-                Sign in as nscpeace1@gmail.com →
-              </button>
-            </form>
-
-            <form
-              action={async () => {
-                "use server";
-                await loginAsAdmin("nscpeace2@gmail.com");
-              }}
-            >
-              <button
-                type="submit"
-                className="btn ghost"
-                style={{ width: "100%", padding: "10px", fontWeight: 700, fontSize: "0.9rem", border: "1px solid rgba(61, 166, 245, 0.4)", color: "#93c5fd" }}
-              >
-                Sign in as nscpeace2@gmail.com →
-              </button>
-            </form>
-          </div>
+              Sign in as nscpeace1@gmail.com →
+            </button>
+          </form>
         </div>
 
         {/* Form for any other authorized email */}

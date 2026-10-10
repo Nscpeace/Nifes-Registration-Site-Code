@@ -12,7 +12,11 @@ type U = {
 
 export default function AccessTable({ rows, adminEmail }: { rows: U[]; adminEmail?: string }) {
   const [all, setAll] = useState(rows);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null);
+  const [pendingRevokeEmail, setPendingRevokeEmail] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const effectiveAdmin = adminEmail || "nscpeace1@gmail.com";
 
   async function update(email: string, body: Record<string, string>) {
     try {
@@ -20,50 +24,69 @@ export default function AccessTable({ rows, adminEmail }: { rows: U[]; adminEmai
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...(adminEmail ? { "X-Admin-Email": adminEmail } : {}),
+          "X-Admin-Email": effectiveAdmin,
         },
         body: JSON.stringify({ email, ...body }),
       });
       const d = await r.json();
-      setMessage(r.ok ? "Access updated." : d.error || "Update failed");
+      setMessage({
+        text: r.ok ? `Access updated for ${email}.` : d.error || "Update failed",
+        error: !r.ok,
+      });
       if (r.ok) setAll((a) => a.map((u) => (u.email.toLowerCase() === email.toLowerCase() ? { ...u, ...body } : u)));
     } catch {
-      setMessage("Update failed. Try again.");
+      setMessage({ text: "Update failed. Please try again.", error: true });
     }
   }
 
-  async function remove(email: string) {
+  async function confirmAndRemove(email: string) {
     const norm = email.toLowerCase();
     if (norm === "nscpeace1@gmail.com") {
-      alert("Main Super Admin nscpeace1@gmail.com cannot be removed.");
+      setMessage({ text: "Super Admin Owner nscpeace1@gmail.com cannot be removed.", error: true });
+      setPendingRevokeEmail(null);
       return;
     }
 
-    if (!confirm(`Are you sure you want to revoke access for ${email}?`)) {
-      return;
-    }
-
+    setIsProcessing(true);
     try {
       const r = await fetch("/api/admin/access", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          ...(adminEmail ? { "X-Admin-Email": adminEmail } : {}),
+          "X-Admin-Email": effectiveAdmin,
         },
         body: JSON.stringify({ email }),
       });
       const d = await r.json();
-      setMessage(r.ok ? `Removed ${email} from authorised users.` : d.error || "Removal failed");
-      if (r.ok) setAll((a) => a.filter((u) => u.email.toLowerCase() !== norm));
+      if (r.ok) {
+        setMessage({
+          text: `Access for ${email} has been revoked successfully. They can no longer access member records or admin tools.`,
+          error: false,
+        });
+        setAll((a) => a.filter((u) => u.email.toLowerCase() !== norm));
+      } else {
+        setMessage({ text: d.error || "Removal failed", error: true });
+      }
     } catch {
-      setMessage("Removal failed. Try again.");
+      setMessage({ text: "Network error during revocation. Please try again.", error: true });
+    } finally {
+      setIsProcessing(false);
+      setPendingRevokeEmail(null);
     }
   }
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "14px 0", flexWrap: "wrap", gap: 10 }}>
-        {message ? <p className="success" style={{ margin: 0 }} role="status">{message}</p> : <div />}
+      <div style={{ margin: "14px 0" }}>
+        {message && (
+          <div
+            className={message.error ? "error" : "success"}
+            style={{ margin: 0, padding: "10px 14px", borderRadius: 8, fontSize: "0.88rem" }}
+            role="status"
+          >
+            {message.text}
+          </div>
+        )}
       </div>
       <div className="glass" style={{ overflowX: "auto" }}>
         <table className="table">
@@ -82,6 +105,8 @@ export default function AccessTable({ rows, adminEmail }: { rows: U[]; adminEmai
             {all.map((u) => {
               const norm = u.email.toLowerCase();
               const isOwner = norm === "nscpeace1@gmail.com";
+              const isPending = pendingRevokeEmail === u.email;
+
               return (
                 <tr key={u.email}>
                   <td>
@@ -122,8 +147,34 @@ export default function AccessTable({ rows, adminEmail }: { rows: U[]; adminEmai
                   <td>
                     {isOwner ? (
                       <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Protected</span>
+                    ) : isPending ? (
+                      <div style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                        <button
+                          type="button"
+                          disabled={isProcessing}
+                          className="button button-primary"
+                          style={{ background: "#dc2626", borderColor: "#ef4444", padding: "4px 10px", fontSize: "0.76rem", fontWeight: 700 }}
+                          onClick={() => void confirmAndRemove(u.email)}
+                        >
+                          {isProcessing ? "Revoking..." : "Confirm Revoke"}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isProcessing}
+                          className="btn ghost"
+                          style={{ padding: "4px 8px", fontSize: "0.76rem" }}
+                          onClick={() => setPendingRevokeEmail(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     ) : (
-                      <button className="btn ghost" style={{ color: "#f43f5e", padding: "6px 12px", fontSize: "0.8rem" }} onClick={() => void remove(u.email)}>
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        style={{ color: "#f43f5e", padding: "6px 12px", fontSize: "0.8rem", border: "1px solid rgba(244, 63, 94, 0.3)" }}
+                        onClick={() => setPendingRevokeEmail(u.email)}
+                      >
                         Revoke Access
                       </button>
                     )}

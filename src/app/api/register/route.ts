@@ -5,7 +5,7 @@ import { normalizeNigerianPhone } from "@/lib/phone";
 import QRCode from "qrcode";
 import { limited } from "@/lib/rate-limit";
 
-const schema = z.object({ firstName: z.string().trim().min(1).max(80), lastName: z.string().trim().min(1).max(80), gender: z.enum(["Male", "Female"]), email: z.string().trim().email().max(254), placeOfResidence: z.string().trim().min(1).max(150), heardAbout: z.enum(["Friend", "WhatsApp", "Instagram", "Flier", "Other"]), heardAboutOther: z.string().trim().max(200).optional(), firstTimer: z.enum(["Yes", "No"]), phone: z.string().min(1), level: z.enum(["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE"]), consent: z.literal(true) });
+const schema = z.object({ firstName: z.string().trim().min(1).max(80), lastName: z.string().trim().min(1).max(80), gender: z.enum(["Male", "Female"]), email: z.string().trim().email().max(254), placeOfResidence: z.string().trim().min(1).max(150), heardAbout: z.enum(["Friend", "WhatsApp", "Instagram", "Flier", "Other"]), heardAboutOther: z.string().trim().max(200).optional(), firstTimer: z.enum(["Yes", "No"]), phone: z.string().min(1), level: z.enum(["L100", "L200", "L300", "L400", "L500", "L600", "POSTGRADUATE", "NON_STUDENT"]), consent: z.literal(true) });
 export async function POST(request: Request) {
   try {
     if (await limited(request, "register", 5, 60 * 60_000)) return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });

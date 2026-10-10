@@ -3,7 +3,7 @@ import {auth} from "@/auth";
 import {db} from "@/lib/db";
 import {z} from "zod";
 
-const levelSchema=z.enum(["L100","L200","L300","L400","L500","L600","POSTGRADUATE"]);
+const levelSchema=z.enum(["L100","L200","L300","L400","L500","L600","POSTGRADUATE","NON_STUDENT"]);
 const genderSchema=z.enum(["Male","Female"]);
 function csv(value:unknown){let text=value==null?"":value instanceof Date?value.toISOString():String(value);if(/^[=+\-@\t\r]/.test(text))text=`'${text}`;return `"${text.replaceAll('"','""')}"`}
 

@@ -48,7 +48,8 @@ export default function RecordsClient({
   const [usersList, setUsersList] = useState<AuthorizedUser[]>(authorizedUsers);
   const [accessMessage, setAccessMessage] = useState<{ text: string; error?: boolean } | null>(null);
   const [addingEmail, setAddingEmail] = useState(false);
-  const [clearingList, setClearingList] = useState(false);
+  const [pendingRevokeEmail, setPendingRevokeEmail] = useState<string | null>(null);
+  const [isRevoking, setIsRevoking] = useState(false);
 
   // Filter attendance records by Day of Service lap
   const filteredAttendance = attendances.filter((att) => {
@@ -124,14 +125,12 @@ export default function RecordsClient({
   async function handleRemoveAccess(email: string) {
     const norm = email.toLowerCase();
     if (norm === "nscpeace1@gmail.com") {
-      alert("Main Super Admin nscpeace1@gmail.com cannot be removed.");
+      setAccessMessage({ text: "Super Admin Owner nscpeace1@gmail.com cannot be removed.", error: true });
+      setPendingRevokeEmail(null);
       return;
     }
 
-    if (!confirm(`Are you sure you want to revoke access for ${email}?`)) {
-      return;
-    }
-
+    setIsRevoking(true);
     try {
       const res = await fetch("/api/admin/access", {
         method: "DELETE",
@@ -144,13 +143,16 @@ export default function RecordsClient({
 
       if (res.ok) {
         setUsersList((prev) => prev.filter((u) => u.email.toLowerCase() !== norm));
-        setAccessMessage({ text: `Access for ${email} has been revoked successfully.`, error: false });
+        setAccessMessage({ text: `Access for ${email} has been revoked successfully. They can no longer access member records or admin tools.`, error: false });
       } else {
         const data = await res.json().catch(() => ({}));
         setAccessMessage({ text: data.error || "Could not remove access.", error: true });
       }
     } catch {
       setAccessMessage({ text: "Network error removing access.", error: true });
+    } finally {
+      setIsRevoking(false);
+      setPendingRevokeEmail(null);
     }
   }
 
@@ -574,12 +576,33 @@ export default function RecordsClient({
                       <td>
                         {isOwner ? (
                           <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Protected</span>
+                        ) : pendingRevokeEmail === user.email ? (
+                          <div style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                            <button
+                              type="button"
+                              disabled={isRevoking}
+                              onClick={() => handleRemoveAccess(user.email)}
+                              className="button button-primary"
+                              style={{ background: "#dc2626", borderColor: "#ef4444", padding: "4px 8px", fontSize: "0.72rem", fontWeight: 700 }}
+                            >
+                              {isRevoking ? "Revoking..." : "Confirm Revoke"}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isRevoking}
+                              onClick={() => setPendingRevokeEmail(null)}
+                              className="btn ghost"
+                              style={{ padding: "4px 6px", fontSize: "0.72rem" }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         ) : (
                           <button
                             type="button"
-                            onClick={() => handleRemoveAccess(user.email)}
+                            onClick={() => setPendingRevokeEmail(user.email)}
                             className="btn ghost"
-                            style={{ padding: "4px 10px", fontSize: "0.75rem", color: "#f43f5e" }}
+                            style={{ padding: "4px 10px", fontSize: "0.75rem", color: "#f43f5e", border: "1px solid rgba(244, 63, 94, 0.3)" }}
                           >
                             Revoke Access
                           </button>

@@ -32,53 +32,6 @@ export default function RecordsLoginCard({
   );
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  async function loginWithQuickAdmin(quickEmail: string) {
-    setEmail(quickEmail);
-    setPassword("NIFES#2026");
-    setLoading(true);
-    setErrorInfo(null);
-    setSuccessMsg(`Signing in as ${quickEmail}...`);
-
-    try {
-      const res = await fetch("/api/auth/records-login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Admin-Email": quickEmail,
-        },
-        body: JSON.stringify({
-          email: quickEmail,
-          password: "NIFES#2026",
-        }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok && data.ok) {
-        setSuccessMsg(`✓ Access granted for ${quickEmail}. Opening Member Records...`);
-        try {
-          document.cookie =
-            "nifes_logged_out=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
-          document.cookie =
-            `nifes_admin_email=${encodeURIComponent(quickEmail)}; path=/; max-age=2592000; SameSite=None; Secure`;
-        } catch {}
-        window.location.href = `/records?admin=${encodeURIComponent(quickEmail)}`;
-      } else {
-        setErrorInfo({
-          type: "error",
-          message: data.message || "Could not log in as admin.",
-        });
-        setLoading(false);
-      }
-    } catch {
-      setErrorInfo({
-        type: "error",
-        message: "Network error during authentication.",
-      });
-      setLoading(false);
-    }
-  }
-
   async function handleLogin(e?: React.FormEvent) {
     if (e) e.preventDefault();
 
@@ -134,7 +87,7 @@ export default function RecordsLoginCard({
         if (data.error === "invalid_password" || data.error === "missing_password") {
           setErrorInfo({
             type: "invalid_password",
-            message: data.message || "Incorrect password. Default portal password is NIFES#2026.",
+            message: data.message || "Incorrect password. Please enter your valid portal password.",
           });
         } else {
           const attempted = data.attempted || trimmedEmail;
@@ -311,50 +264,6 @@ export default function RecordsLoginCard({
           </div>
         )}
 
-        {/* Fast Super Admin Quick Sign-In */}
-        <div
-          style={{
-            background: "rgba(39, 139, 245, 0.12)",
-            border: "1.5px solid rgba(39, 139, 245, 0.35)",
-            borderRadius: 14,
-            padding: "16px 14px",
-            marginBottom: 20,
-            textAlign: "left",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: "1.1rem" }}>🔑</span>
-            <div>
-              <strong style={{ fontSize: "0.92rem", color: "#93c5fd", display: "block" }}>
-                Super Admin Instant Access
-              </strong>
-              <small style={{ color: "#94a3b8", fontSize: "0.78rem" }}>
-                Main Administrators: <strong>nscpeace1@gmail.com</strong> / <strong>nscpeace2@gmail.com</strong>
-              </small>
-            </div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => loginWithQuickAdmin("nscpeace1@gmail.com")}
-              className="button button-primary"
-              style={{ width: "100%", padding: "10px 14px", fontSize: "0.9rem", fontWeight: 700 }}
-            >
-              Sign in as nscpeace1@gmail.com →
-            </button>
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => loginWithQuickAdmin("nscpeace2@gmail.com")}
-              className="btn ghost"
-              style={{ width: "100%", padding: "9px 14px", fontSize: "0.88rem", fontWeight: 700, border: "1px solid rgba(61, 166, 245, 0.4)", color: "#93c5fd" }}
-            >
-              Sign in as nscpeace2@gmail.com →
-            </button>
-          </div>
-        </div>
-
         {/* Authentication Form */}
         <form onSubmit={handleLogin} style={{ textAlign: "left", marginBottom: 20 }}>
           {/* Email input */}
@@ -372,7 +281,7 @@ export default function RecordsLoginCard({
               }}
             >
               <Mail size={15} style={{ color: "#38bdf8" }} />
-              Or enter any authorized email <span style={{ color: "#f43f5e" }}>*</span>
+              Authorised email address <span style={{ color: "#f43f5e" }}>*</span>
             </label>
             <input
               id="admin-email"
@@ -381,8 +290,8 @@ export default function RecordsLoginCard({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. sistermary@gmail.com"
-              autoComplete="off"
+              placeholder="name@example.com"
+              autoComplete="email"
               style={{
                 width: "100%",
                 padding: "12px 14px",
@@ -412,9 +321,6 @@ export default function RecordsLoginCard({
                 <Lock size={15} style={{ color: "#ec4899" }} />
                 Password <span style={{ color: "#f43f5e" }}>*</span>
               </label>
-              <span style={{ fontSize: "0.75rem", color: "#38bdf8", background: "rgba(56, 189, 248, 0.12)", padding: "2px 8px", borderRadius: 6 }}>
-                Password: <strong>NIFES#2026</strong>
-              </span>
             </div>
             <div style={{ position: "relative" }}>
               <input

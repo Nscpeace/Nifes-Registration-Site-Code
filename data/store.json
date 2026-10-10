@@ -2,39 +2,12 @@
   "member": [],
   "adminUser": [
     {
-      "id": "admin_33d53392567b7440a624c8af29eb811b",
-      "email": "nkezechibuikem123@gmail.com",
-      "role": "SUPER_ADMIN",
-      "status": "ACTIVE",
-      "invitedBy": null,
-      "createdAt": "2026-10-09T20:36:36.814Z",
-      "lastLoginAt": null
-    },
-    {
       "id": "admin_4ab94c426c704d3236961397aaf0533a",
       "email": "nscpeace1@gmail.com",
       "role": "SUPER_ADMIN",
       "status": "ACTIVE",
       "invitedBy": null,
       "createdAt": "2026-10-09T20:36:36.814Z",
-      "lastLoginAt": null
-    },
-    {
-      "id": "admin_5bc05d537d815e4347a724a8bbf1644b",
-      "email": "nscpeace2@gmail.com",
-      "role": "SUPER_ADMIN",
-      "status": "ACTIVE",
-      "invitedBy": null,
-      "createdAt": "2026-10-09T20:36:36.814Z",
-      "lastLoginAt": null
-    },
-    {
-      "id": "admin_719ee01c98ef33eaed652218fad23c19",
-      "email": "sistermary@gmail.com",
-      "role": "ADMIN",
-      "status": "ACTIVE",
-      "invitedBy": "admin_f5426b3e34bfe946ab173163158cbb5d",
-      "createdAt": "2026-10-09T20:37:43.584Z",
       "lastLoginAt": null
     }
   ],

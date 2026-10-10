@@ -31,7 +31,7 @@ export function RegistrationForm() {
       return;
     }
     if (!level) {
-      setError("Please select your university level.");
+      setError("Please select your university level or 'Not a Student'.");
       setBusy(false);
       return;
     }
@@ -156,11 +156,11 @@ export function RegistrationForm() {
 
             {/* Animated Dropdown 2: Level */}
             <div className="form-field">
-              <label id="label-level">University level</label>
+              <label id="label-level">University level / Status</label>
               <AnimatedSelect
                 labelId="label-level"
                 value={level}
-                placeholder="Select your level"
+                placeholder="Select your level or Not a Student"
                 onChange={(val) => setLevel(val)}
                 options={[
                   { value: "L100", label: "100 Level (Freshman)" },
@@ -170,6 +170,7 @@ export function RegistrationForm() {
                   { value: "L500", label: "500 Level" },
                   { value: "L600", label: "600 Level (Clinical / Pharmacy)" },
                   { value: "POSTGRADUATE", label: "Postgraduate" },
+                  { value: "NON_STUDENT", label: "Not a Student" },
                 ]}
               />
               <input type="hidden" name="level" value={level} />
