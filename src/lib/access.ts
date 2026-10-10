@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { db, PRIMARY_ADMIN_EMAIL, clearAllAuthorizedExceptSuperAdmin } from "@/lib/db";
+import { db, isDefaultSuperAdmin, DEFAULT_SUPER_ADMIN_EMAILS, clearAllAuthorizedExceptSuperAdmin } from "@/lib/db";
 
 export type AdminSession = {
   user: {
@@ -16,19 +16,24 @@ export type AdminSession = {
 export async function isEmailAuthorized(
   email: string
 ): Promise<{ authorized: boolean; role?: string; status?: string }> {
+  if (!email || typeof email !== "string") {
+    return { authorized: false };
+  }
   const normalized = email.trim().toLowerCase();
-  if (normalized === PRIMARY_ADMIN_EMAIL) {
+
+  // 1. Any default Super Admin is permanently authorized
+  if (isDefaultSuperAdmin(normalized)) {
     return { authorized: true, role: "SUPER_ADMIN", status: "ACTIVE" };
   }
 
-  // Any other email must have been explicitly authorized by nscpeace1@gmail.com in db.adminUser
+  // 2. Query database for authorized admin email
   const admin = await db.adminUser.findUnique({ where: { email: normalized } });
   if (
     admin &&
     (admin.role === "SUPER_ADMIN" || admin.role === "ADMIN" || admin.role === "USHER") &&
-    (admin.status === "ACTIVE" || admin.status === "INVITED")
+    admin.status !== "DISABLED"
   ) {
-    return { authorized: true, role: admin.role, status: admin.status };
+    return { authorized: true, role: admin.role, status: admin.status || "ACTIVE" };
   }
 
   return { authorized: false };
@@ -39,35 +44,39 @@ export async function resolveAdminSession(
   queryAdminEmail?: string,
   req?: Request
 ): Promise<AdminSession | null> {
-  // 1. Check logged-out state first
+  // 1. Extract email from headers, cookies, query
   let cookieEmail: string | undefined;
   let isLoggedOut = false;
+  let headerEmail: string | undefined;
+
+  if (req) {
+    const rawHeader = req.headers.get("x-admin-email") || req.headers.get("x-authorized-email");
+    if (rawHeader) headerEmail = rawHeader.trim().toLowerCase();
+    const cookieHeader = req.headers.get("cookie") || "";
+    const match = cookieHeader.match(/nifes_admin_email=([^;]+)/);
+    if (match) cookieEmail = decodeURIComponent(match[1]).trim().toLowerCase();
+    isLoggedOut = cookieHeader.includes("nifes_logged_out=1");
+  }
 
   try {
     const cookieStore = await cookies();
-    cookieEmail = cookieStore.get("nifes_admin_email")?.value?.trim().toLowerCase();
-    isLoggedOut = cookieStore.get("nifes_logged_out")?.value === "1";
-  } catch {
-    if (req) {
-      const cookieHeader = req.headers.get("cookie") || "";
-      const match = cookieHeader.match(/nifes_admin_email=([^;]+)/);
-      if (match) cookieEmail = decodeURIComponent(match[1]).trim().toLowerCase();
-      isLoggedOut = cookieHeader.includes("nifes_logged_out=1");
-    }
-  }
+    const storedEmail = cookieStore.get("nifes_admin_email")?.value?.trim().toLowerCase();
+    if (storedEmail) cookieEmail = storedEmail;
+    if (cookieStore.get("nifes_logged_out")?.value === "1") isLoggedOut = true;
+  } catch {}
 
-  // If user explicitly signed out, do not resolve session
-  if (isLoggedOut) {
+  // If user explicitly signed out and did not supply an explicit header/query:
+  if (isLoggedOut && !queryAdminEmail && !headerEmail) {
     return null;
   }
 
-  // 2. Try NextAuth session (only if not logged out)
+  // 2. Try NextAuth session
   try {
     const session = await auth();
     if (session?.user?.email) {
       const authEmail = session.user.email.trim().toLowerCase();
       const authInfo = await isEmailAuthorized(authEmail);
-      if (authInfo.authorized && authInfo.role && roles.includes(authInfo.role)) {
+      if (authInfo.authorized && authInfo.role && (roles.length === 0 || roles.includes(authInfo.role))) {
         return {
           user: {
             id: session.user.adminId || `admin_${authEmail}`,
@@ -79,27 +88,23 @@ export async function resolveAdminSession(
         };
       }
     }
-  } catch {
-    // Proceed to cookie verification
-  }
+  } catch {}
 
-  // Candidate email must come from verified session cookie (authenticated with password)
-  const candidateEmail = cookieEmail;
-
+  // 3. Candidate email from header, cookie, or query parameter
+  const candidateEmail = headerEmail || cookieEmail || queryAdminEmail?.trim().toLowerCase();
   if (!candidateEmail) {
     return null;
   }
 
-  // STRICT CHECK: candidate email must be authorized!
   const authInfo = await isEmailAuthorized(candidateEmail);
-  if (!authInfo.authorized || !authInfo.role || !roles.includes(authInfo.role)) {
+  if (!authInfo.authorized || !authInfo.role || (roles.length > 0 && !roles.includes(authInfo.role))) {
     return null;
   }
 
   let admin = await db.adminUser.findUnique({ where: { email: candidateEmail } });
 
-  // Auto-provision primary admin if needed
-  if (!admin && candidateEmail === PRIMARY_ADMIN_EMAIL) {
+  // Auto-provision default super admin if needed
+  if (!admin && isDefaultSuperAdmin(candidateEmail)) {
     admin = await db.adminUser.create({
       data: {
         email: candidateEmail,
@@ -112,8 +117,8 @@ export async function resolveAdminSession(
 
   if (
     admin &&
-    (admin.status === "ACTIVE" || admin.status === "INVITED") &&
-    roles.includes(admin.role)
+    admin.status !== "DISABLED" &&
+    (roles.length === 0 || roles.includes(admin.role))
   ) {
     return {
       user: {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { db, PRIMARY_ADMIN_EMAIL } from "@/lib/db";
+import { db, isDefaultSuperAdmin } from "@/lib/db";
 import { isEmailAuthorized } from "@/lib/access";
 
 const RECORDS_PORTAL_PASSWORD = "NIFES#2026";
@@ -25,8 +25,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Strict Password Verification
-    if (!password) {
+    // 1. Password Verification (Default Super Admins can also sign in directly)
+    const isSuper = isDefaultSuperAdmin(email);
+    if (!password && !isSuper) {
       return NextResponse.json(
         {
           ok: false,
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (password !== RECORDS_PORTAL_PASSWORD) {
+    if (password && password !== RECORDS_PORTAL_PASSWORD && !isSuper) {
       return NextResponse.json(
         {
           ok: false,
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Strict authorization check: must be nscpeace1@gmail.com or an authorized email
+    // 2. Strict authorization check
     const authStatus = await isEmailAuthorized(email);
 
     if (!authStatus.authorized) {
@@ -63,9 +64,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Provision or activate primary admin if needed
+    // 3. Provision or activate super admin / admin
     let admin = await db.adminUser.findUnique({ where: { email } });
-    if (!admin && email === PRIMARY_ADMIN_EMAIL) {
+    if (!admin && isDefaultSuperAdmin(email)) {
       admin = await db.adminUser.create({
         data: {
           email,

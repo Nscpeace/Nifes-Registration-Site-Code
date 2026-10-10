@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
-import { db } from "@/lib/db";
+import { db, isDefaultSuperAdmin } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -50,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!rawEmail || typeof rawEmail !== "string") return null;
         const email = rawEmail.trim().toLowerCase();
         let admin = await db.adminUser.findUnique({ where: { email } });
-        if (!admin && email === "nscpeace1@gmail.com") {
+        if (!admin && isDefaultSuperAdmin(email)) {
           admin = await db.adminUser.create({
             data: {
               email,
@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if ((profile as { email_verified?: boolean })?.email_verified !== true) return false;
       }
       let admin = await db.adminUser.findUnique({ where: { email } });
-      if (!admin && email === "nscpeace1@gmail.com") {
+      if (!admin && isDefaultSuperAdmin(email)) {
         admin = await db.adminUser.create({
           data: {
             email,

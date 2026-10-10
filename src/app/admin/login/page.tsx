@@ -19,7 +19,7 @@ export default async function Login({
 
   // If already authenticated and not explicitly logged out, forward to destination
   if ((session?.user?.adminId || cookieEmail) && !isLoggedOut) {
-    const adminParam = session?.user?.email || cookieEmail || "nscpeace1@gmail.com";
+    const adminParam = session?.user?.email || cookieEmail || "nkezechibuikem123@gmail.com";
     redirect(`${destination}${destination.includes("?") ? "&" : "?"}admin=${encodeURIComponent(adminParam)}`);
   }
 
@@ -27,6 +27,7 @@ export default async function Login({
     "use server";
     const email = emailToLogin.trim().toLowerCase();
     const { isEmailAuthorized } = await import("@/lib/access");
+    const { isDefaultSuperAdmin } = await import("@/lib/db");
     const authStatus = await isEmailAuthorized(email);
     if (!authStatus.authorized) {
       redirect(`/admin/login?error=unauthorized`);
@@ -34,16 +35,23 @@ export default async function Login({
 
     const cookieStore = await cookies();
     cookieStore.delete("nifes_logged_out");
+    cookieStore.set("nifes_logged_out", "", {
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+      sameSite: "none",
+      secure: true,
+    });
     cookieStore.set("nifes_admin_email", email, {
       path: "/",
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
       maxAge: 60 * 60 * 24 * 30, // 30 days
       httpOnly: false,
     });
 
     let admin = await db.adminUser.findUnique({ where: { email } });
-    if (!admin && email === "nscpeace1@gmail.com") {
+    if (!admin && isDefaultSuperAdmin(email)) {
       admin = await db.adminUser.create({
         data: {
           email,
@@ -99,19 +107,20 @@ export default async function Login({
           </p>
         )}
 
-        {/* Primary 1-Click Fast Access for nscpeace1@gmail.com */}
+        {/* Primary 1-Click Fast Access for Main Super Admin nscpeace1@gmail.com */}
         <div style={{ background: "rgba(39, 139, 245, 0.14)", border: "1.5px solid rgba(39, 139, 245, 0.4)", borderRadius: 16, padding: "20px 18px", marginBottom: 24, textAlign: "left" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <span style={{ fontSize: "1.2rem" }}>🔑</span>
             <div>
               <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "#93c5fd" }}>
-                Super Admin Access
+                Main Super Admin Access
               </p>
               <p style={{ margin: "2px 0 0", fontSize: "0.82rem", color: "#cbd5e1" }}>
-                Verified Admin Email: <strong>nscpeace1@gmail.com</strong>
+                Main Administrator: <strong>nscpeace1@gmail.com</strong>
               </p>
             </div>
           </div>
+
           <form
             action={async () => {
               "use server";
@@ -121,7 +130,7 @@ export default async function Login({
             <button
               type="submit"
               className="button button-primary"
-              style={{ width: "100%", padding: "14px", fontWeight: 800, fontSize: "1rem", marginTop: 10, boxShadow: "0 6px 20px rgba(43, 140, 238, 0.4)" }}
+              style={{ width: "100%", padding: "13px", fontWeight: 800, fontSize: "1rem", boxShadow: "0 6px 20px rgba(43, 140, 238, 0.4)" }}
             >
               Sign in as nscpeace1@gmail.com →
             </button>

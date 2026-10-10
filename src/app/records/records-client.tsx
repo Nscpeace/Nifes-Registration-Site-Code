@@ -83,18 +83,21 @@ export default function RecordsClient({
     try {
       const res = await fetch("/api/admin/access", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Email": currentUserEmail,
+        },
         body: JSON.stringify({ email, role }),
       });
       const data = await res.json();
 
       if (res.ok) {
         setAccessMessage({
-          text: `Success! ${email} is now authorized to access Member Records.`,
+          text: `Success! ${email} is now authorized to access Member Records as ${role}. Access will remain active permanently until you revoke it.`,
           error: false,
         });
         setUsersList((prev) => [
-          ...prev.filter((u) => u.email !== email),
+          ...prev.filter((u) => u.email.toLowerCase() !== email.toLowerCase()),
           {
             id: data.id || `admin_${Date.now()}`,
             email,
@@ -119,8 +122,9 @@ export default function RecordsClient({
   }
 
   async function handleRemoveAccess(email: string) {
-    if (email === "nscpeace1@gmail.com") {
-      alert("Super Admin nscpeace1@gmail.com cannot be removed.");
+    const norm = email.toLowerCase();
+    if (norm === "nscpeace1@gmail.com") {
+      alert("Main Super Admin nscpeace1@gmail.com cannot be removed.");
       return;
     }
 
@@ -131,51 +135,22 @@ export default function RecordsClient({
     try {
       const res = await fetch("/api/admin/access", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Email": currentUserEmail,
+        },
         body: JSON.stringify({ email }),
       });
 
       if (res.ok) {
-        setUsersList((prev) => prev.filter((u) => u.email !== email));
-        setAccessMessage({ text: `Access for ${email} has been revoked.`, error: false });
+        setUsersList((prev) => prev.filter((u) => u.email.toLowerCase() !== norm));
+        setAccessMessage({ text: `Access for ${email} has been revoked successfully.`, error: false });
       } else {
         const data = await res.json().catch(() => ({}));
         setAccessMessage({ text: data.error || "Could not remove access.", error: true });
       }
     } catch {
       setAccessMessage({ text: "Network error removing access.", error: true });
-    }
-  }
-
-  async function handleClearAuthorizationList() {
-    const confirmed = confirm(
-      "Are you sure you want to clear the email authorization list for Member Records?\n\n" +
-      "Only primary admin nscpeace1@gmail.com will retain access. All other email addresses will lose access immediately until you authorize them again."
-    );
-    if (!confirmed) return;
-
-    setClearingList(true);
-    setAccessMessage(null);
-    try {
-      const res = await fetch("/api/admin/access", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clearAll: true }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsersList((prev) => prev.filter((u) => u.email.toLowerCase() === "nscpeace1@gmail.com"));
-        setAccessMessage({
-          text: "Authorization list cleared successfully! Only nscpeace1@gmail.com has access to Member Records now.",
-          error: false,
-        });
-      } else {
-        setAccessMessage({ text: data.error || "Could not clear authorization list.", error: true });
-      }
-    } catch {
-      setAccessMessage({ text: "Network error while clearing authorization list.", error: true });
-    } finally {
-      setClearingList(false);
     }
   }
 
@@ -467,38 +442,17 @@ export default function RecordsClient({
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14, marginBottom: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, maxWidth: 600 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, maxWidth: 640 }}>
                 <span style={{ fontSize: "1.3rem" }}>🛡️</span>
                 <div>
                   <h3 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc" }}>
                     Authorized Member Records Access
                   </h3>
                   <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#94a3b8" }}>
-                    Only admin <strong style={{ color: "#3da6f5" }}>nscpeace1@gmail.com</strong> and emails he authorizes have access to the member records database.
+                    Only verified administrators have access to the member records database. Every email authorized below stays permanently authorized until explicitly revoked.
                   </p>
                 </div>
               </div>
-
-              {isSuperAdmin && (
-                <button
-                  type="button"
-                  onClick={handleClearAuthorizationList}
-                  disabled={clearingList}
-                  className="btn ghost"
-                  style={{
-                    color: "#fca5a5",
-                    borderColor: "rgba(244, 63, 94, 0.35)",
-                    background: "rgba(244, 63, 94, 0.08)",
-                    fontSize: "0.82rem",
-                    fontWeight: 700,
-                    padding: "8px 14px",
-                    borderRadius: 8,
-                  }}
-                  title="Remove all authorized emails except primary owner nscpeace1@gmail.com"
-                >
-                  {clearingList ? "Clearing List…" : "🗑️ Clear Authorization List"}
-                </button>
-              )}
             </div>
 
             {/* Authorize New Email Form */}
@@ -509,7 +463,7 @@ export default function RecordsClient({
                 paddingTop: 16,
                 borderTop: "1px solid rgba(255, 255, 255, 0.1)",
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr)) 140px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr)) 160px",
                 gap: 12,
                 alignItems: "flex-end",
               }}
@@ -534,6 +488,7 @@ export default function RecordsClient({
                 </label>
                 <select id="admin-role" name="role" className="dropdown-animated" defaultValue="ADMIN">
                   <option value="ADMIN">Admin (Full Records Access)</option>
+                  <option value="SUPER_ADMIN">Super Admin (All Permissions)</option>
                   <option value="USHER">Usher (Check-in Scanner)</option>
                 </select>
               </div>
@@ -574,7 +529,8 @@ export default function RecordsClient({
               </thead>
               <tbody>
                 {usersList.map((user) => {
-                  const isOwner = user.email.toLowerCase() === "nscpeace1@gmail.com";
+                  const norm = user.email.toLowerCase();
+                  const isOwner = norm === "nscpeace1@gmail.com";
                   return (
                     <tr key={user.id || user.email}>
                       <td>
@@ -609,7 +565,7 @@ export default function RecordsClient({
                       </td>
                       <td>
                         <small style={{ color: "#94a3b8" }}>
-                          {isOwner ? "Initial Setup" : user.invitedByEmail || "nscpeace1@gmail.com"}
+                          {isOwner ? "Primary Super Admin" : user.invitedByEmail || "Super Admin"}
                         </small>
                       </td>
                       <td>
@@ -617,7 +573,7 @@ export default function RecordsClient({
                       </td>
                       <td>
                         {isOwner ? (
-                          <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Primary Admin</span>
+                          <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Protected</span>
                         ) : (
                           <button
                             type="button"

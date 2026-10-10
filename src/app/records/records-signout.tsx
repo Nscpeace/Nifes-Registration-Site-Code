@@ -17,8 +17,9 @@ export default function RecordsSignOutButton() {
       console.error("Sign out error:", e);
     }
 
-    // 2. Client-side cookie cleanup as immediate local protection
+    // 2. Client-side cookie and storage cleanup as immediate local protection
     try {
+      localStorage.removeItem("nifes_admin_email");
       document.cookie =
         "nifes_admin_email=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
       document.cookie =

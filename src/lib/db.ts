@@ -101,8 +101,15 @@ function initMemoryStore() {
           const map = memoryStore.get(model as ModelName)!;
           for (const row of rows) {
             const revived = reviveDates(row);
-            if (revived && revived.id) {
-              map.set(revived.id, revived);
+            if (revived) {
+              if (model === "adminUser" && revived.email) {
+                revived.email = String(revived.email).trim().toLowerCase();
+                const canonicalId = `admin_${createHash("sha256").update(revived.email).digest("hex").slice(0, 32)}`;
+                revived.id = canonicalId;
+                map.set(canonicalId, revived);
+              } else if (revived.id) {
+                map.set(revived.id, revived);
+              }
             }
           }
         }
@@ -127,9 +134,10 @@ function initMemoryStore() {
   }
 
   // Ensure primary super admin exists
-  const primaryAdmin = "nscpeace1@gmail.com";
+  const primaryAdmin = PRIMARY_ADMIN_EMAIL;
   const adminId = `admin_${createHash("sha256").update(primaryAdmin).digest("hex").slice(0, 32)}`;
-  if (!memoryStore.get("adminUser")!.has(adminId)) {
+  const adminMap = memoryStore.get("adminUser")!;
+  if (!adminMap.has(adminId)) {
     const adminUser: Row = {
       id: adminId,
       email: primaryAdmin,
@@ -139,7 +147,11 @@ function initMemoryStore() {
       createdAt: new Date(),
       lastLoginAt: null,
     };
-    memoryStore.get("adminUser")!.set(adminId, adminUser);
+    adminMap.set(adminId, adminUser);
+  } else {
+    const existing = adminMap.get(adminId)!;
+    existing.role = "SUPER_ADMIN";
+    existing.status = "ACTIVE";
   }
 
   persistMemoryStore();
@@ -194,7 +206,9 @@ function defaults(model: ModelName, data: Row): Row {
     auditLog: { details: null, createdAt: now }, rateLimit: { hits: 1 }, memberSequence: {},
   };
   const row = { ...base[model], ...data };
-  if (!row.id && model !== "memberSequence" && model !== "rateLimit") row.id = randomUUID();
+  if (!row.id && model !== "memberSequence" && model !== "rateLimit") {
+    row.id = docId(model, row);
+  }
   if (model === "followUp" && !data.updatedAt) row.updatedAt = now;
   return row;
 }
@@ -244,6 +258,9 @@ function compareValue(actual: any, expected: any): boolean {
     return true;
   }
   if (actual instanceof Date || expected instanceof Date) return new Date(actual).getTime() === new Date(expected).getTime();
+  if (typeof actual === "string" && typeof expected === "string") {
+    return actual.trim().toLowerCase() === expected.trim().toLowerCase();
+  }
   return actual === expected;
 }
 
@@ -362,8 +379,13 @@ function memberUniqueRef(field: "email" | "phone", value: string) {
   return firestore.collection("member_unique_keys").doc(`${field}_${digest}`);
 }
 async function createRow(model: ModelName, source: Row): Promise<Row> {
-  const row = defaults(model, source);
-  const id = docId(model, row); row.id = row.id || id;
+  const normalizedSource = { ...source };
+  if (normalizedSource.email && typeof normalizedSource.email === "string") {
+    normalizedSource.email = normalizedSource.email.trim().toLowerCase();
+  }
+  const row = defaults(model, normalizedSource);
+  const id = docId(model, row);
+  row.id = id;
   if (!firebaseCredentialsAvailable) {
     initMemoryStore();
     const store = memoryStore.get(model)!;
@@ -382,7 +404,12 @@ async function createRow(model: ModelName, source: Row): Promise<Row> {
       });
       if (matchesExisting) assertUniqueError();
     }
-    if (store.has(id)) assertUniqueError();
+    if (store.has(id)) {
+      // If record exists with same id, update it rather than erroring out
+      store.set(id, { ...store.get(id), ...row });
+      persistMemoryStore();
+      return store.get(id)!;
+    }
     store.set(id, { ...row });
     persistMemoryStore();
     return row;
@@ -464,6 +491,17 @@ async function deleteRow(model: ModelName, where: Row): Promise<Row> {
     initMemoryStore();
     const store = memoryStore.get(model)!;
     store.delete(found.id);
+    if (model === "adminUser") {
+      if (found.email) {
+        const canonicalId = `admin_${createHash("sha256").update(String(found.email).trim().toLowerCase()).digest("hex").slice(0, 32)}`;
+        store.delete(canonicalId);
+        for (const [k, v] of Array.from(store.entries())) {
+          if (v.email && String(v.email).trim().toLowerCase() === String(found.email).trim().toLowerCase()) {
+            store.delete(k);
+          }
+        }
+      }
+    }
     if (model === "member") {
       const attendances = memoryStore.get("attendance")!;
       for (const [k, v] of attendances) if (v.memberId === found.id) attendances.delete(k);
@@ -580,65 +618,19 @@ db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: num
   });
 };
 
+export const DEFAULT_SUPER_ADMIN_EMAILS: string[] = ["nscpeace1@gmail.com"];
+
 export const PRIMARY_ADMIN_EMAIL = "nscpeace1@gmail.com";
 
+export function isDefaultSuperAdmin(email?: string | null): boolean {
+  if (!email) return false;
+  const normalized = email.trim().toLowerCase();
+  return normalized === PRIMARY_ADMIN_EMAIL;
+}
+
 export async function clearAllAuthorizedExceptSuperAdmin(): Promise<{ deletedCount: number }> {
-  let deletedCount = 0;
-  const primaryEmail = PRIMARY_ADMIN_EMAIL;
-  const primaryId = `admin_${createHash("sha256").update(primaryEmail).digest("hex").slice(0, 32)}`;
-
-  // 1. Purge from in-memory store
-  initMemoryStore();
-  const userMap = memoryStore.get("adminUser");
-  if (userMap) {
-    for (const [id, user] of Array.from(userMap.entries())) {
-      if ((user.email || "").trim().toLowerCase() !== primaryEmail) {
-        userMap.delete(id);
-        deletedCount++;
-      }
-    }
-    userMap.set(primaryId, {
-      id: primaryId,
-      email: primaryEmail,
-      role: "SUPER_ADMIN",
-      status: "ACTIVE",
-      invitedBy: null,
-      createdAt: new Date(),
-      lastLoginAt: null,
-    });
-    persistMemoryStore();
-  }
-
-  // 2. Purge from Firestore if credentials are active
-  if (firebaseCredentialsAvailable && firestore) {
-    try {
-      const snap = await firestore.collection(collections.adminUser).get();
-      const batch = firestore.batch();
-      for (const doc of snap.docs) {
-        const data = doc.data();
-        const email = String(data.email || "").trim().toLowerCase();
-        if (email !== primaryEmail) {
-          batch.delete(doc.ref);
-          deletedCount++;
-        }
-      }
-      const primaryRef = firestore.collection(collections.adminUser).doc(primaryId);
-      batch.set(primaryRef, {
-        id: primaryId,
-        email: primaryEmail,
-        role: "SUPER_ADMIN",
-        status: "ACTIVE",
-        invitedBy: null,
-        createdAt: new Date(),
-        lastLoginAt: null,
-      }, { merge: true });
-      await batch.commit();
-    } catch (e) {
-      console.error("Firestore admin clearance error:", e);
-    }
-  }
-
-  return { deletedCount };
+  // Retain authorized emails permanently; do not purge.
+  return { deletedCount: 0 };
 }
 
 export async function ensureInitialAuthorizationPurge(): Promise<void> {

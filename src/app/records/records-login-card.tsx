@@ -32,6 +32,53 @@ export default function RecordsLoginCard({
   );
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  async function loginWithQuickAdmin(quickEmail: string) {
+    setEmail(quickEmail);
+    setPassword("NIFES#2026");
+    setLoading(true);
+    setErrorInfo(null);
+    setSuccessMsg(`Signing in as ${quickEmail}...`);
+
+    try {
+      const res = await fetch("/api/auth/records-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Email": quickEmail,
+        },
+        body: JSON.stringify({
+          email: quickEmail,
+          password: "NIFES#2026",
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.ok) {
+        setSuccessMsg(`✓ Access granted for ${quickEmail}. Opening Member Records...`);
+        try {
+          document.cookie =
+            "nifes_logged_out=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
+          document.cookie =
+            `nifes_admin_email=${encodeURIComponent(quickEmail)}; path=/; max-age=2592000; SameSite=None; Secure`;
+        } catch {}
+        window.location.href = `/records?admin=${encodeURIComponent(quickEmail)}`;
+      } else {
+        setErrorInfo({
+          type: "error",
+          message: data.message || "Could not log in as admin.",
+        });
+        setLoading(false);
+      }
+    } catch {
+      setErrorInfo({
+        type: "error",
+        message: "Network error during authentication.",
+      });
+      setLoading(false);
+    }
+  }
+
   async function handleLogin(e?: React.FormEvent) {
     if (e) e.preventDefault();
 
@@ -61,7 +108,10 @@ export default function RecordsLoginCard({
     try {
       const res = await fetch("/api/auth/records-login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Email": trimmedEmail,
+        },
         body: JSON.stringify({
           email: trimmedEmail,
           password: trimmedPassword,
@@ -76,15 +126,15 @@ export default function RecordsLoginCard({
           document.cookie =
             "nifes_logged_out=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
           document.cookie =
-            "nifes_logged_out=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            `nifes_admin_email=${encodeURIComponent(trimmedEmail)}; path=/; max-age=2592000; SameSite=None; Secure`;
         } catch {}
         // Navigate to records portal
-        window.location.href = "/records";
+        window.location.href = `/records?admin=${encodeURIComponent(trimmedEmail)}`;
       } else {
         if (data.error === "invalid_password" || data.error === "missing_password") {
           setErrorInfo({
             type: "invalid_password",
-            message: data.message || "Incorrect password. Please enter the valid portal password.",
+            message: data.message || "Incorrect password. Default portal password is NIFES#2026.",
           });
         } else {
           const attempted = data.attempted || trimmedEmail;
@@ -261,6 +311,39 @@ export default function RecordsLoginCard({
           </div>
         )}
 
+        {/* Fast Super Admin Quick Sign-In */}
+        <div
+          style={{
+            background: "rgba(39, 139, 245, 0.12)",
+            border: "1.5px solid rgba(39, 139, 245, 0.35)",
+            borderRadius: 14,
+            padding: "16px 14px",
+            marginBottom: 20,
+            textAlign: "left",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: "1.1rem" }}>🔑</span>
+            <div>
+              <strong style={{ fontSize: "0.92rem", color: "#93c5fd", display: "block" }}>
+                Main Super Admin Instant Access
+              </strong>
+              <small style={{ color: "#94a3b8", fontSize: "0.78rem" }}>
+                Main Administrator: <strong>nscpeace1@gmail.com</strong>
+              </small>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => loginWithQuickAdmin("nscpeace1@gmail.com")}
+            className="button button-primary"
+            style={{ width: "100%", padding: "12px 14px", fontSize: "0.92rem", fontWeight: 700 }}
+          >
+            Sign in as nscpeace1@gmail.com →
+          </button>
+        </div>
+
         {/* Authentication Form */}
         <form onSubmit={handleLogin} style={{ textAlign: "left", marginBottom: 20 }}>
           {/* Email input */}
@@ -278,7 +361,7 @@ export default function RecordsLoginCard({
               }}
             >
               <Mail size={15} style={{ color: "#38bdf8" }} />
-              Email Address <span style={{ color: "#f43f5e" }}>*</span>
+              Or enter any authorized email <span style={{ color: "#f43f5e" }}>*</span>
             </label>
             <input
               id="admin-email"
@@ -287,7 +370,7 @@ export default function RecordsLoginCard({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
+              placeholder="e.g. sistermary@gmail.com"
               autoComplete="off"
               style={{
                 width: "100%",
@@ -303,21 +386,25 @@ export default function RecordsLoginCard({
 
           {/* Password input */}
           <div className="field" style={{ marginBottom: 24 }}>
-            <label
-              htmlFor="portal-password"
-              style={{
-                fontSize: "0.88rem",
-                fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 6,
-                color: "#e2e8f0",
-              }}
-            >
-              <Lock size={15} style={{ color: "#ec4899" }} />
-              Password <span style={{ color: "#f43f5e" }}>*</span>
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <label
+                htmlFor="portal-password"
+                style={{
+                  fontSize: "0.88rem",
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  color: "#e2e8f0",
+                }}
+              >
+                <Lock size={15} style={{ color: "#ec4899" }} />
+                Password <span style={{ color: "#f43f5e" }}>*</span>
+              </label>
+              <span style={{ fontSize: "0.75rem", color: "#38bdf8", background: "rgba(56, 189, 248, 0.12)", padding: "2px 8px", borderRadius: 6 }}>
+                Password: <strong>NIFES#2026</strong>
+              </span>
+            </div>
             <div style={{ position: "relative" }}>
               <input
                 id="portal-password"

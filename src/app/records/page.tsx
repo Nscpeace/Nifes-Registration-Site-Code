@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { resolveAdminSession } from "@/lib/access";
-import { db } from "@/lib/db";
+import { db, isDefaultSuperAdmin } from "@/lib/db";
 import RecordsClient, { type AttendanceItem, type AuthorizedUser } from "./records-client";
 import RecordsLoginCard from "./records-login-card";
 import RecordsSignOutButton from "./records-signout";
@@ -54,7 +54,7 @@ export default async function MemberRecordsPage({
 
   // --- USER IS AUTHENTICATED ---
   const currentAdmin = session.user.email;
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN" || currentAdmin === "nscpeace1@gmail.com";
+  const isSuperAdmin = session.user.role === "SUPER_ADMIN" || isDefaultSuperAdmin(currentAdmin);
 
   // Fetch all members
   const rawMembers = await db.member.findMany({
@@ -137,7 +137,7 @@ export default async function MemberRecordsPage({
     role: u.role,
     status: u.status,
     createdAt: u.createdAt instanceof Date ? u.createdAt.toLocaleDateString() : String(u.createdAt || "Seeded"),
-    invitedByEmail: u.inviter?.email ?? (u.email === "nscpeace1@gmail.com" ? "Owner" : null),
+    invitedByEmail: u.inviter?.email ?? (isDefaultSuperAdmin(u.email) ? "Super Admin Owner" : null),
   }));
 
   const totalMembers = members.filter((m) => !m.guest).length;
