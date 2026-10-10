@@ -326,22 +326,33 @@ export default function RecordsLoginCard({
             <span style={{ fontSize: "1.1rem" }}>🔑</span>
             <div>
               <strong style={{ fontSize: "0.92rem", color: "#93c5fd", display: "block" }}>
-                Main Super Admin Instant Access
+                Super Admin Instant Access
               </strong>
               <small style={{ color: "#94a3b8", fontSize: "0.78rem" }}>
-                Main Administrator: <strong>nscpeace1@gmail.com</strong>
+                Main Administrators: <strong>nscpeace1@gmail.com</strong> / <strong>nscpeace2@gmail.com</strong>
               </small>
             </div>
           </div>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => loginWithQuickAdmin("nscpeace1@gmail.com")}
-            className="button button-primary"
-            style={{ width: "100%", padding: "12px 14px", fontSize: "0.92rem", fontWeight: 700 }}
-          >
-            Sign in as nscpeace1@gmail.com →
-          </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => loginWithQuickAdmin("nscpeace1@gmail.com")}
+              className="button button-primary"
+              style={{ width: "100%", padding: "10px 14px", fontSize: "0.9rem", fontWeight: 700 }}
+            >
+              Sign in as nscpeace1@gmail.com →
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => loginWithQuickAdmin("nscpeace2@gmail.com")}
+              className="btn ghost"
+              style={{ width: "100%", padding: "9px 14px", fontSize: "0.88rem", fontWeight: 700, border: "1px solid rgba(61, 166, 245, 0.4)", color: "#93c5fd" }}
+            >
+              Sign in as nscpeace2@gmail.com →
+            </button>
+          </div>
         </div>
 
         {/* Authentication Form */}
