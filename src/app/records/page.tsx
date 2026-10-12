@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { resolveAdminSession } from "@/lib/access";
 import { db, isDefaultSuperAdmin } from "@/lib/db";
-import RecordsClient, { type AttendanceItem, type AuthorizedUser } from "./records-client";
+import RecordsClient, { type AttendanceItem, type AuthorizedUser, type ServiceSessionItem } from "./records-client";
 import RecordsLoginCard from "./records-login-card";
 import RecordsSignOutButton from "./records-signout";
 import { type Member } from "@/app/admin/members/table";
@@ -79,12 +79,11 @@ export default async function MemberRecordsPage({
     createdAt: m.createdAt instanceof Date ? m.createdAt.toISOString() : String(m.createdAt || new Date().toISOString()),
   }));
 
-  // Fetch all attendance records with session & member details
-  let rawAttendances: any[] = [];
+  // Fetch all service sessions
+  let rawSessions: any[] = [];
   try {
-    rawAttendances = await db.attendance.findMany({
-      include: { member: true, session: true },
-      orderBy: { checkedInAt: "desc" },
+    rawSessions = await db.session.findMany({
+      orderBy: { startsAt: "desc" },
     });
   } catch {
     // Graceful
@@ -103,6 +102,28 @@ export default async function MemberRecordsPage({
     return days[dayIndex] || "Weekly";
   }
 
+  const sessions: ServiceSessionItem[] = rawSessions.map((s) => ({
+    id: s.id,
+    eventId: s.eventId || "",
+    name: s.name || "Fellowship Service",
+    dayOfService: s.dayOfService || getDayOfService(s.name, s.startsAt),
+    startsAt: s.startsAt instanceof Date ? s.startsAt.toISOString() : String(s.startsAt || new Date().toISOString()),
+    endsAt: s.endsAt instanceof Date ? s.endsAt.toISOString() : s.endsAt ? String(s.endsAt) : null,
+    venue: s.venue || "FAGCOOP Multipurpose Hall",
+    active: Boolean(s.active),
+  }));
+
+  // Fetch all attendance records with session & member details
+  let rawAttendances: any[] = [];
+  try {
+    rawAttendances = await db.attendance.findMany({
+      include: { member: true, session: true },
+      orderBy: { checkedInAt: "desc" },
+    });
+  } catch {
+    // Graceful
+  }
+
   const attendances: AttendanceItem[] = rawAttendances.map((a) => {
     const sName = a.session?.name || "Fellowship Service";
     const day = a.session?.dayOfService || getDayOfService(sName, a.session?.startsAt || a.checkedInAt);
@@ -110,6 +131,8 @@ export default async function MemberRecordsPage({
     return {
       id: a.id,
       memberId: a.member?.memberId || "—",
+      memberDbId: a.member?.id || a.memberId,
+      sessionId: a.sessionId,
       memberName: a.member ? `${a.member.firstName} ${a.member.lastName}` : "Unknown Member",
       memberPhone: a.member?.phone || "—",
       memberEmail: a.member?.email ?? null,
@@ -212,7 +235,7 @@ export default async function MemberRecordsPage({
             Member Records & Program Attendance
           </h1>
           <p className="muted" style={{ margin: 0, fontSize: "0.95rem" }}>
-            Authorized portal for member directory, service lap attendance, and team access.
+            Authorized portal for member directory, day of service attendance tracking, and absentee compilation.
           </p>
         </div>
 
@@ -239,6 +262,7 @@ export default async function MemberRecordsPage({
       {/* Client Component with 3 Tabs: Members, Attendance by Lap & Day of Service, and Authorized Admins */}
       <RecordsClient
         members={members}
+        sessions={sessions}
         attendances={attendances}
         authorizedUsers={authorizedUsers}
         currentUserEmail={currentAdmin}

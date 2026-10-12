@@ -2,388 +2,1298 @@
   "member": [
     {
       "id": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67",
-      "placeOfResidence": "Ekosodin",
       "memberId": "NIFES-2026-0001",
-      "lastName": "Nleze",
-      "phone": "+2347040149267",
-      "firstTimer": true,
+      "firstName": "Rejoice",
+      "lastName": "Nkeze",
+      "gender": "Female",
+      "dateOfBirth": "2009-08-13",
+      "email": "nscpeace1@gmail.com",
+      "phone": "+2348159706643",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "WhatsApp",
       "heardAboutOther": null,
-      "firstName": "Shalom",
-      "heardAbout": "Friend",
-      "email": "nkezechibuikem123@gmail.com",
-      "level": "L300",
-      "consentGivenAt": "2026-10-10T01:48:28.893Z",
+      "firstTimer": true,
       "guest": false,
-      "createdAt": "2026-10-10T01:48:28.893Z",
-      "gender": "Male"
+      "level": "L600",
+      "consentGivenAt": "2026-10-12T14:55:23.960Z",
+      "createdAt": "2026-10-12T14:55:23.960Z"
     },
     {
       "id": "922e604c-27b3-4435-9af5-ee451a45b274",
-      "email": "nscpeace1@gmail.com",
-      "level": "L600",
-      "dateOfBirth": "2009-08-13",
-      "consentGivenAt": "2026-10-12T14:55:23.960Z",
-      "phone": "+2348159706643",
-      "firstName": "Rejoice",
-      "placeOfResidence": "Ekosodin",
-      "firstTimer": true,
-      "heardAboutOther": null,
-      "heardAbout": "WhatsApp",
-      "lastName": "Nkeze",
-      "memberId": "NIFES-2026-0001",
-      "createdAt": "2026-10-12T14:55:23.960Z",
-      "gender": "Female",
-      "guest": false
-    },
-    {
-      "id": "0786e1ea-93be-4119-b69e-5f3e4aa8f86b",
-      "guest": false,
-      "placeOfResidence": "Hall 1",
+      "memberId": "NIFES-2026-0002",
+      "firstName": "Emmanuel",
+      "lastName": "Okafor",
       "gender": "Male",
-      "firstTimer": false,
-      "heardAbout": "WhatsApp",
-      "firstName": "David",
-      "memberId": "NIFES-2026-0003",
-      "consentGivenAt": "2026-10-12T15:09:51.915Z",
-      "phone": "+2348098765432",
-      "lastName": "Eze",
-      "level": "L300",
-      "email": "david.eze@example.com",
-      "dateOfBirth": "2003-08-20",
+      "dateOfBirth": "2002-05-14",
+      "email": "emmanuel.test@example.com",
+      "phone": "+2348012345678",
+      "placeOfResidence": "Hall 2",
+      "heardAbout": "Friend",
       "heardAboutOther": null,
-      "createdAt": "2026-10-12T15:09:51.915Z"
+      "firstTimer": true,
+      "guest": false,
+      "level": "L200",
+      "consentGivenAt": "2026-10-12T15:09:44.875Z",
+      "createdAt": "2026-10-12T15:09:44.875Z"
     },
     {
       "id": "34eb3902-7d01-421a-9fcd-396beed5126a",
-      "placeOfResidence": "Hall 2",
-      "guest": false,
-      "createdAt": "2026-10-12T15:09:44.875Z",
-      "heardAboutOther": null,
+      "memberId": "NIFES-2026-0003",
+      "firstName": "David",
+      "lastName": "Eze",
       "gender": "Male",
+      "dateOfBirth": "2003-08-20",
+      "email": "david.eze@example.com",
+      "phone": "+2348098765432",
+      "placeOfResidence": "Hall 1",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-10-12T15:09:51.915Z",
+      "createdAt": "2026-10-12T15:09:51.915Z"
+    },
+    {
+      "id": "0786e1ea-93be-4119-b69e-5f3e4aa8f86b",
+      "memberId": "NIFES-2026-0004",
+      "firstName": "Chidiebere",
+      "lastName": "Eze",
+      "gender": "Male",
+      "dateOfBirth": "2004-02-18",
+      "email": "chidi.eze@uniben.edu.ng",
+      "phone": "+2348039876543",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-10-12T15:15:00.000Z",
+      "createdAt": "2026-10-12T15:15:00.000Z"
+    },
+    {
+      "id": "member_preview_0005_uibf21",
+      "memberId": "NIFES-2026-0005",
+      "firstName": "Blessing",
+      "lastName": "Osagie",
+      "gender": "Female",
+      "dateOfBirth": "2005-03-14",
+      "email": "blessing.osagie@uniben.edu.ng",
+      "phone": "+2348021112233",
+      "placeOfResidence": "Hall 2",
       "heardAbout": "Friend",
-      "firstTimer": true,
-      "memberId": "NIFES-2026-0002",
-      "consentGivenAt": "2026-10-12T15:09:44.875Z",
-      "lastName": "Okafor",
-      "firstName": "Emmanuel",
-      "email": "emmanuel.test@example.com",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
       "level": "L200",
-      "phone": "+2348012345678",
-      "dateOfBirth": "2002-05-14"
+      "consentGivenAt": "2026-09-02T16:09:34.462Z",
+      "createdAt": "2026-09-02T16:09:34.462Z"
+    },
+    {
+      "id": "member_preview_0006_3bweyg",
+      "memberId": "NIFES-2026-0006",
+      "firstName": "Praise",
+      "lastName": "Adeleke",
+      "gender": "Female",
+      "dateOfBirth": "2003-11-20",
+      "email": "praise.adeleke@gmail.com",
+      "phone": "+2348132223344",
+      "placeOfResidence": "BDPA",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L400",
+      "consentGivenAt": "2026-09-04T16:09:34.463Z",
+      "createdAt": "2026-09-04T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0007_bd8s4m",
+      "memberId": "NIFES-2026-0007",
+      "firstName": "Victor",
+      "lastName": "Igwe",
+      "gender": "Male",
+      "dateOfBirth": "2002-07-08",
+      "email": "victor.igwe@uniben.edu.ng",
+      "phone": "+2348143334455",
+      "placeOfResidence": "Main Campus",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L500",
+      "consentGivenAt": "2026-09-06T16:09:34.463Z",
+      "createdAt": "2026-09-06T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0008_bvr22k",
+      "memberId": "NIFES-2026-0008",
+      "firstName": "Deborah",
+      "lastName": "Omoigui",
+      "gender": "Female",
+      "dateOfBirth": "2006-09-12",
+      "email": "deborah.omoigui@gmail.com",
+      "phone": "+2348054445566",
+      "placeOfResidence": "Hall 1",
+      "heardAbout": "Flier",
+      "heardAboutOther": null,
+      "firstTimer": true,
+      "guest": false,
+      "level": "L100",
+      "consentGivenAt": "2026-09-08T16:09:34.463Z",
+      "createdAt": "2026-09-08T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0009_o0qeqp",
+      "memberId": "NIFES-2026-0009",
+      "firstName": "Joshua",
+      "lastName": "Danladi",
+      "gender": "Male",
+      "dateOfBirth": "2004-01-25",
+      "email": "joshua.danladi@uniben.edu.ng",
+      "phone": "+2348165556677",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-09-10T16:09:34.463Z",
+      "createdAt": "2026-09-10T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0010_y0q8ms",
+      "memberId": "NIFES-2026-0010",
+      "firstName": "Favour",
+      "lastName": "Okoro",
+      "gender": "Female",
+      "dateOfBirth": "2005-06-30",
+      "email": "favour.okoro@gmail.com",
+      "phone": "+2348076667788",
+      "placeOfResidence": "BDPA",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L200",
+      "consentGivenAt": "2026-09-12T16:09:34.463Z",
+      "createdAt": "2026-09-12T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0011_572kci",
+      "memberId": "NIFES-2026-0011",
+      "firstName": "Samuel",
+      "lastName": "Chukwu",
+      "gender": "Male",
+      "dateOfBirth": "2003-04-17",
+      "email": "samuel.chukwu@uniben.edu.ng",
+      "phone": "+2348187778899",
+      "placeOfResidence": "Osasogie",
+      "heardAbout": "Instagram",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L400",
+      "consentGivenAt": "2026-09-14T16:09:34.463Z",
+      "createdAt": "2026-09-14T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0012_o2gltv",
+      "memberId": "NIFES-2026-0012",
+      "firstName": "Miracle",
+      "lastName": "Bello",
+      "gender": "Female",
+      "dateOfBirth": "2006-12-05",
+      "email": "miracle.bello@gmail.com",
+      "phone": "+2348098889900",
+      "placeOfResidence": "Hall 3",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": true,
+      "guest": false,
+      "level": "L100",
+      "consentGivenAt": "2026-09-16T16:09:34.463Z",
+      "createdAt": "2026-09-16T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0013_aykd3k",
+      "memberId": "NIFES-2026-0013",
+      "firstName": "Peace",
+      "lastName": "Enoma",
+      "gender": "Female",
+      "dateOfBirth": "2004-08-22",
+      "email": "peace.enoma@uniben.edu.ng",
+      "phone": "+2348109990011",
+      "placeOfResidence": "Greens",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-09-18T16:09:34.463Z",
+      "createdAt": "2026-09-18T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0014_5pwuck",
+      "memberId": "NIFES-2026-0014",
+      "firstName": "Emmanuel",
+      "lastName": "Eromosele",
+      "gender": "Male",
+      "dateOfBirth": "2005-02-19",
+      "email": "emmanuel.eromosele@uniben.edu.ng",
+      "phone": "+2348110001122",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L200",
+      "consentGivenAt": "2026-09-20T16:09:34.463Z",
+      "createdAt": "2026-09-20T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0015_kqz32e",
+      "memberId": "NIFES-2026-0015",
+      "firstName": "Esther",
+      "lastName": "Balogun",
+      "gender": "Female",
+      "dateOfBirth": "2003-10-10",
+      "email": "esther.balogun@gmail.com",
+      "phone": "+2348121112233",
+      "placeOfResidence": "Hall 2",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L400",
+      "consentGivenAt": "2026-09-22T16:09:34.463Z",
+      "createdAt": "2026-09-22T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0016_gfulop",
+      "memberId": "NIFES-2026-0016",
+      "firstName": "David",
+      "lastName": "Ojo",
+      "gender": "Male",
+      "dateOfBirth": "2002-05-15",
+      "email": "david.ojo@uniben.edu.ng",
+      "phone": "+2348132223345",
+      "placeOfResidence": "Medical Hostel",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L500",
+      "consentGivenAt": "2026-09-24T16:09:34.463Z",
+      "createdAt": "2026-09-24T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0017_yfgo69",
+      "memberId": "NIFES-2026-0017",
+      "firstName": "Grace",
+      "lastName": "Akpan",
+      "gender": "Female",
+      "dateOfBirth": "2005-11-28",
+      "email": "grace.akpan@gmail.com",
+      "phone": "+2348143334456",
+      "placeOfResidence": "BDPA",
+      "heardAbout": "Flier",
+      "heardAboutOther": null,
+      "firstTimer": true,
+      "guest": false,
+      "level": "L200",
+      "consentGivenAt": "2026-09-26T16:09:34.463Z",
+      "createdAt": "2026-09-26T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0018_86k4b6",
+      "memberId": "NIFES-2026-0018",
+      "firstName": "Kelechi",
+      "lastName": "Nwosu",
+      "gender": "Male",
+      "dateOfBirth": "2004-03-09",
+      "email": "kelechi.nwosu@uniben.edu.ng",
+      "phone": "+2348154445567",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-09-28T16:09:34.463Z",
+      "createdAt": "2026-09-28T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0019_vh8han",
+      "memberId": "NIFES-2026-0019",
+      "firstName": "Joy",
+      "lastName": "Ogbebor",
+      "gender": "Female",
+      "dateOfBirth": "2006-07-04",
+      "email": "joy.ogbebor@gmail.com",
+      "phone": "+2348165556678",
+      "placeOfResidence": "Hall 1",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": true,
+      "guest": false,
+      "level": "L100",
+      "consentGivenAt": "2026-09-30T16:09:34.463Z",
+      "createdAt": "2026-09-30T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0020_k7t3jh",
+      "memberId": "NIFES-2026-0020",
+      "firstName": "Daniel",
+      "lastName": "Idahosa",
+      "gender": "Male",
+      "dateOfBirth": "2003-12-14",
+      "email": "daniel.idahosa@uniben.edu.ng",
+      "phone": "+2348176667789",
+      "placeOfResidence": "Osasogie",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L400",
+      "consentGivenAt": "2026-10-02T16:09:34.463Z",
+      "createdAt": "2026-10-02T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0021_91mueh",
+      "memberId": "NIFES-2026-0021",
+      "firstName": "Ruth",
+      "lastName": "Uche",
+      "gender": "Female",
+      "dateOfBirth": "2005-04-02",
+      "email": "ruth.uche@gmail.com",
+      "phone": "+2348187778890",
+      "placeOfResidence": "BDPA",
+      "heardAbout": "Instagram",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L200",
+      "consentGivenAt": "2026-10-04T16:09:34.463Z",
+      "createdAt": "2026-10-04T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0022_jeshap",
+      "memberId": "NIFES-2026-0022",
+      "firstName": "Timothy",
+      "lastName": "Aghedo",
+      "gender": "Male",
+      "dateOfBirth": "2004-09-17",
+      "email": "timothy.aghedo@uniben.edu.ng",
+      "phone": "+2348198889901",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-10-06T16:09:34.463Z",
+      "createdAt": "2026-10-06T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0023_bi7qzp",
+      "memberId": "NIFES-2026-0023",
+      "firstName": "Mercy",
+      "lastName": "Okojie",
+      "gender": "Female",
+      "dateOfBirth": "2006-01-30",
+      "email": "mercy.okojie@gmail.com",
+      "phone": "+2348029990012",
+      "placeOfResidence": "Hall 4",
+      "heardAbout": "Flier",
+      "heardAboutOther": null,
+      "firstTimer": true,
+      "guest": false,
+      "level": "L100",
+      "consentGivenAt": "2026-10-08T16:09:34.463Z",
+      "createdAt": "2026-10-08T16:09:34.463Z"
+    },
+    {
+      "id": "member_preview_0024_0sl5cz",
+      "memberId": "NIFES-2026-0024",
+      "firstName": "Gabriel",
+      "lastName": "Osunde",
+      "gender": "Male",
+      "dateOfBirth": "2004-10-11",
+      "email": "gabriel.osunde@uniben.edu.ng",
+      "phone": "+2348031113344",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "WhatsApp",
+      "heardAboutOther": null,
+      "firstTimer": false,
+      "guest": false,
+      "level": "L300",
+      "consentGivenAt": "2026-10-10T16:09:34.463Z",
+      "createdAt": "2026-10-10T16:09:34.463Z"
+    },
+    {
+      "guest": false,
+      "email": "kamsi.obi.test@gmail.com",
+      "dateOfBirth": "2004-12-10",
+      "placeOfResidence": "Ekosodin",
+      "heardAbout": "Friend",
+      "heardAboutOther": null,
+      "level": "L200",
+      "consentGivenAt": "2026-10-12T16:17:02.332Z",
+      "createdAt": "2026-10-12T16:17:02.332Z",
+      "memberId": "NIFES-2026-0025",
+      "firstName": "Kamsi",
+      "lastName": "Obi",
+      "gender": "Male",
+      "firstTimer": true,
+      "phone": "+2348091112233",
+      "id": "0f75b94d-7a2f-4158-a53d-6ebbe6948835"
     }
   ],
   "adminUser": [
     {
       "id": "admin_4ab94c426c704d3236961397aaf0533a",
-      "createdAt": "2026-10-10T05:09:04.511Z",
-      "lastLoginAt": null,
-      "role": "SUPER_ADMIN",
-      "email": "nscpeace1@gmail.com",
       "invitedBy": null,
-      "status": "ACTIVE"
+      "email": "nscpeace1@gmail.com",
+      "status": "ACTIVE",
+      "role": "SUPER_ADMIN",
+      "lastLoginAt": null,
+      "createdAt": "2026-10-10T05:09:04.511Z"
     },
     {
       "id": "admin_33d53392567b7440a624c8af29eb811b",
-      "email": "nkezechibuikem123@gmail.com",
       "status": "ACTIVE",
+      "email": "nkezechibuikem123@gmail.com",
       "role": "ADMIN",
-      "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
       "createdAt": "2026-10-12T14:51:24.713Z",
+      "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
       "lastLoginAt": null
     }
   ],
   "recurringEvent": [
     {
       "id": "foundation-class",
-      "name": "Foundation Class",
+      "venue": "FAGCOOP Multipurpose Hall",
       "recurrence": "WEEKLY",
-      "weekday": 0,
       "startTime": "14:30",
       "timeTBA": false,
-      "venue": "FAGCOOP Multipurpose Hall",
+      "name": "Foundation Class",
       "active": true,
       "checkInOpensMinutes": 60,
-      "checkInClosesMinutes": 120
+      "checkInClosesMinutes": 120,
+      "weekday": 0
     },
     {
       "id": "sunday-service",
-      "name": "Sunday Service",
-      "recurrence": "WEEKLY",
-      "weekday": 0,
-      "startTime": "15:30",
-      "timeTBA": false,
       "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
       "checkInOpensMinutes": 60,
-      "checkInClosesMinutes": 120
+      "recurrence": "WEEKLY",
+      "startTime": "15:30",
+      "name": "Sunday Service",
+      "weekday": 0,
+      "checkInClosesMinutes": 120,
+      "active": true,
+      "timeTBA": false
     },
     {
       "id": "prayer-meeting",
-      "name": "Prayer Meeting",
-      "recurrence": "WEEKLY",
-      "weekday": 2,
       "startTime": "17:30",
+      "recurrence": "WEEKLY",
       "timeTBA": false,
       "venue": "FAGCOOP Multipurpose Hall",
+      "checkInClosesMinutes": 120,
       "active": true,
       "checkInOpensMinutes": 60,
-      "checkInClosesMinutes": 120
+      "weekday": 2,
+      "name": "Prayer Meeting"
     },
     {
       "id": "bible-study",
-      "name": "Bible Study",
-      "recurrence": "WEEKLY",
-      "weekday": 5,
-      "startTime": "17:00",
       "timeTBA": false,
-      "venue": "FAGCOOP Multipurpose Hall",
       "active": true,
       "checkInOpensMinutes": 60,
+      "startTime": "17:00",
+      "venue": "FAGCOOP Multipurpose Hall",
+      "name": "Bible Study",
+      "weekday": 5,
+      "recurrence": "WEEKLY",
       "checkInClosesMinutes": 120
     },
     {
       "id": "mass-evangelism",
-      "name": "Mass Evangelism",
+      "timeTBA": true,
+      "active": true,
+      "checkInClosesMinutes": 120,
       "recurrence": "LAST_SATURDAY",
       "weekday": null,
-      "startTime": "12:00",
-      "timeTBA": true,
-      "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
       "checkInOpensMinutes": 60,
-      "checkInClosesMinutes": 120
+      "venue": "FAGCOOP Multipurpose Hall",
+      "name": "Mass Evangelism",
+      "startTime": "12:00"
     }
   ],
   "session": [
     {
+      "id": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "endsAt": null,
+      "eventId": "sunday-service",
+      "startsAt": "2026-10-11T14:30:00.000Z",
+      "venue": "FAGCOOP Multipurpose Hall",
+      "name": "Sunday Service",
+      "active": true
+    },
+    {
+      "id": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "name": "Bible Study",
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "endsAt": null,
+      "startsAt": "2026-10-09T16:00:00.000Z",
+      "eventId": "bible-study"
+    },
+    {
+      "id": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "startsAt": "2026-10-13T16:30:00.000Z",
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
+      "endsAt": null,
+      "eventId": "prayer-meeting",
+      "name": "Prayer Meeting"
+    },
+    {
+      "id": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "name": "Foundation Class",
+      "venue": "FAGCOOP Multipurpose Hall",
+      "active": true,
       "eventId": "foundation-class",
       "endsAt": null,
+      "startsAt": "2026-10-11T13:30:00.000Z"
+    },
+    {
+      "id": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "venue": "FAGCOOP Multipurpose Hall & Campus",
+      "eventId": "mass-evangelism",
+      "name": "Mass Evangelism",
+      "startsAt": "2026-10-10T12:00:00.000Z",
+      "active": true,
+      "dayOfService": "Last Saturday",
+      "endsAt": "2026-10-10T15:00:00.000Z"
+    },
+    {
+      "id": "0bd446b6-8409-4984-8f16-6bc310c23204",
+      "eventId": "bible-study",
+      "endsAt": null,
+      "startsAt": "2026-10-16T16:00:00.000Z",
+      "name": "Bible Study",
+      "active": true,
+      "venue": "FAGCOOP Multipurpose Hall"
+    },
+    {
+      "id": "4ffb67ba-c7b1-4dab-b8aa-2fe0896215a5",
+      "eventId": "sunday-service",
+      "startsAt": "2026-10-18T14:30:00.000Z",
+      "endsAt": null,
       "venue": "FAGCOOP Multipurpose Hall",
+      "name": "Sunday Service",
+      "active": true
+    },
+    {
+      "id": "7ee0bba9-33fc-45ce-b044-e4cf36a73afe",
+      "name": "Mass Evangelism",
+      "eventId": "mass-evangelism",
+      "endsAt": null,
+      "active": true,
+      "venue": "FAGCOOP Multipurpose Hall & Campus",
+      "startsAt": "2026-10-10T02:59:23.910Z"
+    },
+    {
+      "id": "e07be608-ce76-4d71-9cdc-65cd5edade77",
       "active": true,
       "name": "Foundation Class",
-      "startsAt": "2026-10-11T13:30:00.000Z",
-      "id": "b000312e-6667-4648-aeb0-fea7ae06ebec"
-    },
-    {
-      "eventId": "sunday-service",
+      "startsAt": "2026-10-18T13:30:00.000Z",
       "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
-      "name": "Sunday Service",
-      "startsAt": "2026-10-11T14:30:00.000Z",
-      "id": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
-    },
-    {
-      "eventId": "prayer-meeting",
-      "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
-      "name": "Prayer Meeting",
-      "startsAt": "2026-10-13T16:30:00.000Z",
-      "id": "be057f6a-6919-47e9-90fd-1092ff243ed0"
-    },
-    {
-      "eventId": "bible-study",
-      "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
-      "name": "Bible Study",
-      "startsAt": "2026-10-09T16:00:00.000Z",
-      "id": "81d35814-d3b3-4525-a190-695e3fdbf4a8"
-    },
-    {
-      "eventId": "bible-study",
-      "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall",
-      "active": true,
-      "name": "Bible Study",
-      "startsAt": "2026-10-16T16:00:00.000Z",
-      "id": "0bd446b6-8409-4984-8f16-6bc310c23204"
-    },
-    {
-      "eventId": "mass-evangelism",
-      "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall & Campus",
-      "active": true,
-      "name": "Mass Evangelism",
-      "startsAt": "2026-10-10T01:32:14.198Z",
-      "id": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80"
-    },
-    {
-      "eventId": "mass-evangelism",
-      "endsAt": null,
-      "venue": "FAGCOOP Multipurpose Hall & Campus",
-      "active": true,
-      "name": "Mass Evangelism",
-      "startsAt": "2026-10-10T02:59:23.910Z",
-      "id": "7ee0bba9-33fc-45ce-b044-e4cf36a73afe"
+      "eventId": "foundation-class",
+      "venue": "FAGCOOP Multipurpose Hall"
     }
   ],
-  "attendance": [],
+  "attendance": [
+    {
+      "id": "att_922e604c-27b3-4435-9af5-ee451a45b274_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:06:00.000Z",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "QR",
+      "memberId": "922e604c-27b3-4435-9af5-ee451a45b274"
+    },
+    {
+      "id": "att_34eb3902-7d01-421a-9fcd-396beed5126a_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "memberId": "34eb3902-7d01-421a-9fcd-396beed5126a",
+      "checkedInAt": "2026-10-11T14:07:00.000Z",
+      "method": "QR",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
+    },
+    {
+      "id": "att_0786e1ea-93be-4119-b69e-5f3e4aa8f86b_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "SELF",
+      "memberId": "0786e1ea-93be-4119-b69e-5f3e4aa8f86b",
+      "checkedInAt": "2026-10-11T14:08:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0005_uibf21_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "memberId": "member_preview_0005_uibf21",
+      "checkedInAt": "2026-10-11T14:09:00.000Z",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0006_3bweyg_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:10:00.000Z",
+      "memberId": "member_preview_0006_3bweyg",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0007_bd8s4m_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "SELF",
+      "checkedInAt": "2026-10-11T14:11:00.000Z",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "memberId": "member_preview_0007_bd8s4m"
+    },
+    {
+      "id": "att_member_preview_0009_o0qeqp_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "QR",
+      "memberId": "member_preview_0009_o0qeqp",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:13:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0010_y0q8ms_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "SELF",
+      "memberId": "member_preview_0010_y0q8ms",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:14:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0013_aykd3k_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "memberId": "member_preview_0013_aykd3k",
+      "checkedInAt": "2026-10-11T14:17:00.000Z",
+      "method": "SELF",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
+    },
+    {
+      "id": "att_member_preview_0014_5pwuck_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "QR",
+      "checkedInAt": "2026-10-11T14:18:00.000Z",
+      "memberId": "member_preview_0014_5pwuck"
+    },
+    {
+      "id": "att_member_preview_0015_kqz32e_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "QR",
+      "memberId": "member_preview_0015_kqz32e",
+      "checkedInAt": "2026-10-11T14:19:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0017_yfgo69_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:21:00.000Z",
+      "memberId": "member_preview_0017_yfgo69",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0018_86k4b6_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:22:00.000Z",
+      "memberId": "member_preview_0018_86k4b6",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0020_k7t3jh_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "memberId": "member_preview_0020_k7t3jh",
+      "method": "QR",
+      "checkedInAt": "2026-10-11T14:24:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0022_jeshap_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "method": "SELF",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:26:00.000Z",
+      "memberId": "member_preview_0022_jeshap"
+    },
+    {
+      "id": "att_member_preview_0024_0sl5cz_ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+      "checkedInAt": "2026-10-11T14:28:00.000Z",
+      "method": "QR",
+      "memberId": "member_preview_0024_0sl5cz",
+      "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
+    },
+    {
+      "id": "att_5838cffa-3045-44c0-b4e6-83b3b4dc0f67_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR",
+      "checkedInAt": "2026-10-09T16:10:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67"
+    },
+    {
+      "id": "att_34eb3902-7d01-421a-9fcd-396beed5126a_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:12:00.000Z",
+      "method": "QR",
+      "memberId": "34eb3902-7d01-421a-9fcd-396beed5126a",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8"
+    },
+    {
+      "id": "att_member_preview_0005_uibf21_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR",
+      "checkedInAt": "2026-10-09T16:14:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0005_uibf21"
+    },
+    {
+      "id": "att_member_preview_0007_bd8s4m_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR",
+      "checkedInAt": "2026-10-09T16:16:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0007_bd8s4m"
+    },
+    {
+      "id": "att_member_preview_0008_bvr22k_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:17:00.000Z",
+      "method": "USHER",
+      "memberId": "member_preview_0008_bvr22k",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8"
+    },
+    {
+      "id": "att_member_preview_0010_y0q8ms_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:19:00.000Z",
+      "memberId": "member_preview_0010_y0q8ms",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0011_572kci_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR",
+      "memberId": "member_preview_0011_572kci",
+      "checkedInAt": "2026-10-09T16:20:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8"
+    },
+    {
+      "id": "att_member_preview_0012_o2gltv_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "USHER",
+      "checkedInAt": "2026-10-09T16:21:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0012_o2gltv"
+    },
+    {
+      "id": "att_member_preview_0014_5pwuck_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:23:00.000Z",
+      "memberId": "member_preview_0014_5pwuck",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0016_gfulop_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0016_gfulop",
+      "method": "USHER",
+      "checkedInAt": "2026-10-09T16:25:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0017_yfgo69_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0017_yfgo69",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR",
+      "checkedInAt": "2026-10-09T16:26:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0019_vh8han_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0019_vh8han",
+      "checkedInAt": "2026-10-09T16:28:00.000Z",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0021_91mueh_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:30:00.000Z",
+      "memberId": "member_preview_0021_91mueh",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0022_jeshap_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:31:00.000Z",
+      "memberId": "member_preview_0022_jeshap",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0023_bi7qzp_81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "checkedInAt": "2026-10-09T16:32:00.000Z",
+      "sessionId": "81d35814-d3b3-4525-a190-695e3fdbf4a8",
+      "memberId": "member_preview_0023_bi7qzp",
+      "method": "QR"
+    },
+    {
+      "id": "att_5838cffa-3045-44c0-b4e6-83b3b4dc0f67_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:15:00.000Z",
+      "memberId": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67",
+      "method": "QR",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0"
+    },
+    {
+      "id": "att_922e604c-27b3-4435-9af5-ee451a45b274_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:16:00.000Z",
+      "method": "QR",
+      "memberId": "922e604c-27b3-4435-9af5-ee451a45b274"
+    },
+    {
+      "id": "att_0786e1ea-93be-4119-b69e-5f3e4aa8f86b_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "method": "QR",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:18:00.000Z",
+      "memberId": "0786e1ea-93be-4119-b69e-5f3e4aa8f86b"
+    },
+    {
+      "id": "att_member_preview_0006_3bweyg_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0006_3bweyg",
+      "method": "QR",
+      "checkedInAt": "2026-10-06T16:20:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0009_o0qeqp_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "method": "QR",
+      "memberId": "member_preview_0009_o0qeqp",
+      "checkedInAt": "2026-10-06T16:23:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0011_572kci_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0011_572kci",
+      "checkedInAt": "2026-10-06T16:25:00.000Z",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0012_o2gltv_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "method": "QR",
+      "checkedInAt": "2026-10-06T16:26:00.000Z",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0012_o2gltv"
+    },
+    {
+      "id": "att_member_preview_0013_aykd3k_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "method": "QR",
+      "memberId": "member_preview_0013_aykd3k",
+      "checkedInAt": "2026-10-06T16:27:00.000Z",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0"
+    },
+    {
+      "id": "att_member_preview_0015_kqz32e_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:29:00.000Z",
+      "memberId": "member_preview_0015_kqz32e",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0016_gfulop_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0016_gfulop",
+      "method": "QR",
+      "checkedInAt": "2026-10-06T16:30:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0018_86k4b6_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:32:00.000Z",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0018_86k4b6",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0020_k7t3jh_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "memberId": "member_preview_0020_k7t3jh",
+      "checkedInAt": "2026-10-06T16:34:00.000Z",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "method": "QR"
+    },
+    {
+      "id": "att_member_preview_0021_91mueh_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:35:00.000Z",
+      "memberId": "member_preview_0021_91mueh",
+      "method": "QR",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0"
+    },
+    {
+      "id": "att_member_preview_0023_bi7qzp_be057f6a-6919-47e9-90fd-1092ff243ed0",
+      "checkedInAt": "2026-10-06T16:37:00.000Z",
+      "memberId": "member_preview_0023_bi7qzp",
+      "method": "QR",
+      "sessionId": "be057f6a-6919-47e9-90fd-1092ff243ed0"
+    },
+    {
+      "id": "att_5838cffa-3045-44c0-b4e6-83b3b4dc0f67_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "method": "SELF",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67"
+    },
+    {
+      "id": "att_922e604c-27b3-4435-9af5-ee451a45b274_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "922e604c-27b3-4435-9af5-ee451a45b274",
+      "method": "SELF"
+    },
+    {
+      "id": "att_34eb3902-7d01-421a-9fcd-396beed5126a_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "34eb3902-7d01-421a-9fcd-396beed5126a",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "method": "SELF"
+    },
+    {
+      "id": "att_member_preview_0005_uibf21_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "member_preview_0005_uibf21",
+      "method": "SELF",
+      "checkedInAt": "2026-10-11T13:35:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0008_bvr22k_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "memberId": "member_preview_0008_bvr22k",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "method": "SELF"
+    },
+    {
+      "id": "att_member_preview_0010_y0q8ms_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "member_preview_0010_y0q8ms",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "method": "SELF",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec"
+    },
+    {
+      "id": "att_member_preview_0012_o2gltv_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "method": "SELF",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "memberId": "member_preview_0012_o2gltv"
+    },
+    {
+      "id": "att_member_preview_0015_kqz32e_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "method": "SELF",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "memberId": "member_preview_0015_kqz32e"
+    },
+    {
+      "id": "att_member_preview_0017_yfgo69_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "method": "SELF",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "memberId": "member_preview_0017_yfgo69"
+    },
+    {
+      "id": "att_member_preview_0019_vh8han_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "checkedInAt": "2026-10-11T13:35:00.000Z",
+      "memberId": "member_preview_0019_vh8han",
+      "method": "SELF",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec"
+    },
+    {
+      "id": "att_member_preview_0023_bi7qzp_b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "sessionId": "b000312e-6667-4648-aeb0-fea7ae06ebec",
+      "method": "SELF",
+      "memberId": "member_preview_0023_bi7qzp",
+      "checkedInAt": "2026-10-11T13:35:00.000Z"
+    },
+    {
+      "id": "att_5838cffa-3045-44c0-b4e6-83b3b4dc0f67_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER",
+      "memberId": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80"
+    },
+    {
+      "id": "att_922e604c-27b3-4435-9af5-ee451a45b274_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER",
+      "memberId": "922e604c-27b3-4435-9af5-ee451a45b274",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80"
+    },
+    {
+      "id": "att_34eb3902-7d01-421a-9fcd-396beed5126a_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "34eb3902-7d01-421a-9fcd-396beed5126a",
+      "method": "USHER",
+      "checkedInAt": "2026-10-10T12:15:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0005_uibf21_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0005_uibf21",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0006_3bweyg_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "method": "USHER",
+      "memberId": "member_preview_0006_3bweyg"
+    },
+    {
+      "id": "att_member_preview_0007_bd8s4m_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0007_bd8s4m"
+    },
+    {
+      "id": "att_member_preview_0008_bvr22k_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0008_bvr22k",
+      "method": "USHER",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0010_y0q8ms_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "method": "USHER",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "memberId": "member_preview_0010_y0q8ms"
+    },
+    {
+      "id": "att_member_preview_0011_572kci_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0011_572kci",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0013_aykd3k_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "method": "USHER",
+      "memberId": "member_preview_0013_aykd3k",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0015_kqz32e_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0015_kqz32e",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0016_gfulop_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "method": "USHER",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0016_gfulop",
+      "checkedInAt": "2026-10-10T12:15:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0017_yfgo69_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "memberId": "member_preview_0017_yfgo69",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0019_vh8han_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0019_vh8han",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0020_k7t3jh_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0020_k7t3jh",
+      "method": "USHER"
+    },
+    {
+      "id": "att_member_preview_0022_jeshap_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0022_jeshap",
+      "method": "USHER",
+      "checkedInAt": "2026-10-10T12:15:00.000Z"
+    },
+    {
+      "id": "att_member_preview_0023_bi7qzp_1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80",
+      "memberId": "member_preview_0023_bi7qzp",
+      "method": "USHER",
+      "checkedInAt": "2026-10-10T12:15:00.000Z",
+      "sessionId": "1f1da4b5-ddfb-4b02-b0ff-c5e250f06e80"
+    }
+  ],
   "followUp": [],
   "auditLog": [
     {
       "id": "f05709c5-8207-4461-ae3c-9fdf066197d0",
       "action": "ACCESS_INVITED",
-      "createdAt": "2026-10-09T20:37:43.584Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
         "email": "sistermary@gmail.com",
         "role": "ADMIN"
       },
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+      "createdAt": "2026-10-09T20:37:43.584Z"
     },
     {
       "id": "3b27ed30-0efd-414e-9ecd-56d0a83cb3d2",
-      "action": "ACCESS_INVITED",
-      "createdAt": "2026-10-10T01:45:40.296Z",
       "details": {
         "role": "USHER",
         "email": "nkezechibuikem123@gmail.com"
       },
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+      "createdAt": "2026-10-10T01:45:40.296Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_INVITED"
     },
     {
       "id": "ec56177d-5b9a-4348-8a35-4d5796988698",
-      "createdAt": "2026-10-10T01:45:49.078Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "ACCESS_INVITED",
+      "createdAt": "2026-10-10T01:45:49.078Z",
       "details": {
-        "role": "SUPER_ADMIN",
-        "email": "nscpeace2@gmail.com"
-      },
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+        "email": "nscpeace2@gmail.com",
+        "role": "SUPER_ADMIN"
+      }
     },
     {
       "id": "53abba8f-e298-4f8b-b14b-8b5a78d42011",
-      "action": "ACCESS_REMOVED",
       "createdAt": "2026-10-12T14:14:34.478Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_REMOVED",
       "details": {
-        "role": "USHER",
-        "email": "nscpeace2@gmail.com"
-      },
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+        "email": "nscpeace2@gmail.com",
+        "role": "USHER"
+      }
     },
     {
       "id": "cadc0af1-3610-4dca-a020-29688061128e",
       "createdAt": "2026-10-12T14:15:05.836Z",
       "details": {
-        "role": "ADMIN",
-        "email": "nkezechibuikem123@gmail.com"
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "ADMIN"
       },
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "ACCESS_REMOVED"
     },
     {
       "id": "ea1625ed-ee06-414e-abc1-c2e9492005b7",
-      "createdAt": "2026-10-12T14:15:17.276Z",
-      "action": "ACCESS_INVITED",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-12T14:15:17.276Z",
       "details": {
         "email": "nscpeace2@gmail.com",
         "role": "ADMIN"
-      }
-    },
-    {
-      "id": "21d11371-d0d9-4a10-b78c-08fd4c12fd60",
-      "action": "ACCESS_INVITED",
-      "createdAt": "2026-10-12T14:15:48.121Z",
-      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d",
-      "details": {
-        "email": "nkezechibuikem123@gmail.com",
-        "role": "ADMIN"
-      }
-    },
-    {
-      "id": "8d7f2d27-ccee-4eec-ae62-b2fe42869993",
-      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d",
-      "details": {
-        "email": "nkezechibuikem123@gmail.com",
-        "role": "ADMIN"
-      },
-      "action": "ACCESS_REMOVED",
-      "createdAt": "2026-10-12T14:16:15.098Z"
-    },
-    {
-      "id": "d2121e2b-bb26-430d-bd9d-0c54b9b64369",
-      "createdAt": "2026-10-12T14:51:24.839Z",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
-      "details": {
-        "role": "ADMIN",
-        "email": "nkezechibuikem123@gmail.com"
       },
       "action": "ACCESS_INVITED"
     },
     {
-      "id": "3a471bf6-66b5-4007-abc5-9476ac99bc4a",
-      "action": "ACCESS_REMOVED",
-      "createdAt": "2026-10-12T14:51:31.963Z",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
-      "details": {
-        "email": "nscpeace2@gmail.com",
-        "role": "ADMIN"
-      }
-    },
-    {
-      "id": "11e8a312-eda9-446b-91be-fc1ca829c076",
-      "createdAt": "2026-10-10T05:09:05.106Z",
-      "action": "ACCESS_INVITED",
+      "id": "21d11371-d0d9-4a10-b78c-08fd4c12fd60",
       "details": {
         "role": "ADMIN",
         "email": "nkezechibuikem123@gmail.com"
       },
+      "action": "ACCESS_INVITED",
+      "createdAt": "2026-10-12T14:15:48.121Z",
+      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d"
+    },
+    {
+      "id": "8d7f2d27-ccee-4eec-ae62-b2fe42869993",
+      "createdAt": "2026-10-12T14:16:15.098Z",
+      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d",
+      "action": "ACCESS_REMOVED",
+      "details": {
+        "role": "ADMIN",
+        "email": "nkezechibuikem123@gmail.com"
+      }
+    },
+    {
+      "id": "d2121e2b-bb26-430d-bd9d-0c54b9b64369",
+      "details": {
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "ADMIN"
+      },
+      "action": "ACCESS_INVITED",
+      "createdAt": "2026-10-12T14:51:24.839Z",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
-      "id": "2e693307-95b1-40f2-be1e-4945a2c5695b",
-      "action": "ACCESS_REMOVED",
+      "id": "3a471bf6-66b5-4007-abc5-9476ac99bc4a",
+      "details": {
+        "role": "ADMIN",
+        "email": "nscpeace2@gmail.com"
+      },
+      "createdAt": "2026-10-12T14:51:31.963Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_REMOVED"
+    },
+    {
+      "id": "11e8a312-eda9-446b-91be-fc1ca829c076",
+      "createdAt": "2026-10-10T05:09:05.106Z",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
-        "role": "USHER",
-        "email": "nkezechibuikem123@gmail.com"
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "ADMIN"
       },
+      "action": "ACCESS_INVITED"
+    },
+    {
+      "id": "2e693307-95b1-40f2-be1e-4945a2c5695b",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "USHER"
+      },
+      "action": "ACCESS_REMOVED",
       "createdAt": "2026-10-10T05:08:47.708Z"
     },
     {
       "id": "38ad7936-0d96-45ea-a27c-7ec767592e89",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "DATA_EXPORTED",
       "details": {
-        "from": null,
-        "level": null,
-        "sessionId": null,
         "to": null,
-        "gender": null,
-        "type": "members"
+        "sessionId": null,
+        "level": null,
+        "type": "members",
+        "from": null,
+        "gender": null
       },
       "createdAt": "2026-10-10T13:57:44.008Z",
-      "action": "DATA_EXPORTED"
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
       "id": "5d5706f5-ad3d-4c3f-aa1b-7eaf2205cee2",
-      "createdAt": "2026-10-10T13:59:58.070Z",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
         "role": "ADMIN",
         "email": "nscpeace2@gmail.com"
       },
+      "createdAt": "2026-10-10T13:59:58.070Z",
       "action": "ACCESS_REMOVED"
     },
     {
       "id": "61a44ec4-a00a-4a16-a5ec-b34c1affe69f",
       "createdAt": "2026-10-10T13:59:44.154Z",
-      "action": "ACCESS_INVITED",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
         "role": "ADMIN",
         "email": "nscpeace2@gmail.com"
-      }
+      },
+      "action": "ACCESS_INVITED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
       "id": "650e1f35-b003-410c-9f67-0c6a15d2f397",
+      "details": {
+        "role": "ADMIN",
+        "email": "nscpeace2@gmail.com"
+      },
       "createdAt": "2026-10-10T13:59:06.366Z",
       "adminId": "admin_33d53392567b7440a624c8af29eb811b",
-      "details": {
-        "email": "nscpeace2@gmail.com",
-        "role": "ADMIN"
-      },
       "action": "ACCESS_REMOVED"
     },
     {
@@ -392,69 +1302,181 @@
         "email": "nscpeace2@gmail.com",
         "role": "ADMIN"
       },
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "ACCESS_INVITED",
-      "createdAt": "2026-10-10T05:08:56.177Z"
+      "createdAt": "2026-10-10T05:08:56.177Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
       "id": "e54968aa-0dba-4dc5-99e8-8438423382c9",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_INVITED",
       "details": {
-        "role": "USHER",
-        "email": "nscpeace2@gmail.com"
+        "email": "nscpeace2@gmail.com",
+        "role": "USHER"
       },
       "createdAt": "2026-10-10T14:00:06.522Z",
-      "action": "ACCESS_INVITED"
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
       "id": "0e391ce4-ccfb-4a0a-ab61-f40e8d1e7a45",
-      "action": "DATA_EXPORTED",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
-        "from": null,
         "gender": null,
-        "type": "members",
-        "sessionId": null,
+        "from": null,
+        "level": null,
         "to": null,
-        "level": null
+        "type": "members",
+        "sessionId": null
       },
-      "createdAt": "2026-10-12T15:09:29.880Z"
+      "createdAt": "2026-10-12T15:09:29.880Z",
+      "action": "DATA_EXPORTED"
     },
     {
       "id": "827acae6-efe4-4fe9-9768-ce93f902c3a3",
-      "action": "DATA_EXPORTED",
+      "createdAt": "2026-10-12T15:09:55.832Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
-        "to": null,
-        "from": null,
         "sessionId": null,
-        "level": null,
+        "gender": null,
+        "to": null,
         "type": "members",
-        "gender": null
+        "level": null,
+        "from": null
+      },
+      "action": "DATA_EXPORTED"
+    },
+    {
+      "id": "91e63078-42cb-456f-8171-7fac1a918f08",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "DATA_EXPORTED",
+      "createdAt": "2026-10-12T15:10:20.928Z",
+      "details": {
+        "gender": null,
+        "from": null,
+        "to": null,
+        "sessionId": null,
+        "type": "members",
+        "level": null
+      }
+    },
+    {
+      "id": "48cd7947-9fab-46e3-a8e8-b40e96613d33",
+      "details": {
+        "memberId": "NIFES-2026-0003"
+      },
+      "createdAt": "2026-10-12T15:13:17.911Z",
+      "action": "MEMBER_DELETED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "053f17af-cddd-4806-8179-bf2363f1de77",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "memberId": "NIFES-2026-0003"
+      },
+      "action": "MEMBER_DELETED",
+      "createdAt": "2026-10-12T15:13:17.917Z"
+    },
+    {
+      "id": "6f20d7bd-b442-44b8-86d7-dc40d365805a",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "memberId": "NIFES-2026-0004"
+      },
+      "action": "MEMBER_DELETED",
+      "createdAt": "2026-10-12T15:13:24.714Z"
+    },
+    {
+      "id": "4ba79917-5d73-41cf-8b4b-32b1a6b74e36",
+      "action": "MEMBER_UPDATED",
+      "details": {
+        "memberId": "NIFES-2026-0002"
       },
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
-      "createdAt": "2026-10-12T15:09:55.832Z"
+      "createdAt": "2026-10-12T15:13:32.270Z"
+    },
+    {
+      "id": "41e83195-e006-42e5-a783-0ee70558df6c",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "memberId": "NIFES-2026-0002"
+      },
+      "action": "MEMBER_UPDATED",
+      "createdAt": "2026-10-12T15:13:33.311Z"
+    },
+    {
+      "id": "a2d2c637-ad04-43ee-832f-999bbfa44ab8",
+      "details": {
+        "memberId": "NIFES-2026-0002"
+      },
+      "createdAt": "2026-10-12T15:13:34.553Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "MEMBER_UPDATED"
+    },
+    {
+      "id": "e345eecf-8d2c-4d0a-8302-6c623037b127",
+      "details": {
+        "memberId": "NIFES-2026-0002"
+      },
+      "createdAt": "2026-10-12T15:13:35.614Z",
+      "action": "MEMBER_UPDATED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "9f5f44b0-8137-479a-aae6-d4325d0083ba",
+      "details": {
+        "memberId": "NIFES-2026-0002"
+      },
+      "action": "MEMBER_UPDATED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-12T15:13:36.051Z"
+    },
+    {
+      "id": "ab82635e-8a36-43e0-ad83-35f4d561daee",
+      "createdAt": "2026-10-12T16:19:37.166Z",
+      "details": {
+        "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
+        "memberId": "NIFES-2026-0025"
+      },
+      "action": "MANUAL_CHECKIN",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "b45cbddb-e368-40ba-baee-bd844ec50fda",
+      "createdAt": "2026-10-12T16:19:46.335Z",
+      "details": {
+        "memberId": "NIFES-2026-0025",
+        "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "MANUAL_CHECKIN_REMOVED"
     },
     {
       "details": {
-        "type": "members",
+        "type": "absent",
         "from": null,
         "to": null,
-        "sessionId": null,
+        "sessionId": "ed785e90-592d-4a6c-950d-c4dd61e6d00c",
         "gender": null,
         "level": null
       },
-      "createdAt": "2026-10-12T15:10:20.928Z",
+      "createdAt": "2026-10-12T16:19:56.195Z",
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "DATA_EXPORTED",
-      "id": "91e63078-42cb-456f-8171-7fac1a918f08"
+      "id": "68be44f1-f619-4bce-8fca-c3f51d662066"
     }
   ],
   "rateLimit": [
     {
       "id": "register:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
       "key": "register:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
-      "hits": 2,
-      "resetAt": "2026-10-12T16:09:44.615Z"
+      "hits": 1,
+      "resetAt": "2026-10-12T17:17:02.037Z"
+    },
+    {
+      "id": "register:fac3304f8285b72232b2a174f0a180a80fb5f918112fd35016e1e90e280e7b9a",
+      "key": "register:fac3304f8285b72232b2a174f0a180a80fb5f918112fd35016e1e90e280e7b9a",
+      "hits": 1,
+      "resetAt": "2026-10-12T16:12:35.548Z"
     }
   ],
   "memberSequence": []

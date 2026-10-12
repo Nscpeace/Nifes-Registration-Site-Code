@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 
 export type Member = {
@@ -22,6 +22,10 @@ export type Member = {
 
 export default function MemberTable({ rows, adminEmail }: { rows: Member[]; adminEmail?: string }) {
   const [all, setAll] = useState(rows);
+
+  useEffect(() => {
+    setAll(rows);
+  }, [rows]);
   const [query, setQuery] = useState("");
   const [gender, setGender] = useState("");
   const [level, setLevel] = useState("");

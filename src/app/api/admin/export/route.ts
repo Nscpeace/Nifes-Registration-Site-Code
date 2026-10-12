@@ -18,7 +18,28 @@ export async function GET(req:Request){
  const dateRange={...(from?{gte:new Date(from)}:{}),...(to?{lte:new Date(to)}:{})};
  if((from&&Number.isNaN(Date.parse(from)))||(to&&Number.isNaN(Date.parse(to))))return NextResponse.json({error:"Invalid date filter."},{status:400});
  let lines:string[]=[];
- if(type==="attendance"){
+ if(type==="absent"){
+  const allMembers=await db.member.findMany({where:{guest:false,...(gender?.success?{gender:gender.data}:{}),...(level?.success?{level:level.data}:{})},orderBy:{firstName:"asc"}});
+  const targetSession=sessionId ? await db.session.findUnique({where:{id:sessionId}}) : (await db.session.findMany({orderBy:{startsAt:"desc"},take:1}))[0];
+  const attendances=targetSession ? await db.attendance.findMany({where:{sessionId:targetSession.id}}) : [];
+  const attendedMemberIds=new Set(attendances.map((a:any)=>a.memberId));
+  const absentMembers=allMembers.filter((m:any)=>!attendedMemberIds.has(m.id));
+  const sName=targetSession?.name || "Fellowship Service";
+  const sDay=targetSession?.dayOfService || "Service Day";
+  lines=["Member ID,First Name,Last Name,Phone,Email,Residence,Level,First Timer,Missed Service,Day of Service,Venue",...absentMembers.map((m:any)=>[
+    m.memberId || "",
+    m.firstName || "",
+    m.lastName || "",
+    m.phone || "",
+    m.email || "",
+    m.placeOfResidence || "",
+    m.level || "",
+    m.firstTimer ? "Yes" : "No",
+    sName,
+    sDay,
+    targetSession?.venue || "FAGCOOP Multipurpose Hall"
+  ].map(csv).join(","))];
+ }else if(type==="attendance"){
   const records=await db.attendance.findMany({where:{...(sessionId?{sessionId}:{}),...(gender?.success||level?.success?{member:{...(gender?.success?{gender:gender.data}:{}),...(level?.success?{level:level.data}:{})}}:{}),checkedInAt:dateRange},include:{member:true,session:true},orderBy:{checkedInAt:"desc"}});
   lines=["Member ID,First Name,Last Name,Email,Phone,Session,Day of Service,Venue,Checked In At,Method",...records.map(a=>{
     const sName = a.session?.name || "Fellowship Service";

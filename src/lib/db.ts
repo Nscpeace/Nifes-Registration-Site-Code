@@ -252,33 +252,43 @@ function relation(model: ModelName, field: string) {
 function flattenWhere(where: Row = {}): Row {
   const result: Row = {};
   for (const [key, value] of Object.entries(where)) {
-    if (key === "eventId_startsAt" && value && typeof value === "object") Object.assign(result, value);
-    else result[key] = value;
+    if ((key === "eventId_startsAt" || key === "memberId_sessionId") && value && typeof value === "object") {
+      Object.assign(result, value);
+    } else {
+      result[key] = value;
+    }
   }
   return result;
 }
 function compareValue(actual: any, expected: any): boolean {
+  if (actual === undefined && expected !== undefined) return false;
   actual = actual instanceof Date ? actual.getTime() : actual;
   if (expected instanceof Date) expected = expected.getTime();
   if (expected && typeof expected === "object" && !(expected instanceof Date) && !(expected instanceof Timestamp) && !Array.isArray(expected)) {
-    for (const [op, value] of Object.entries(expected)) {
-      const right = value instanceof Date ? value.getTime() : value;
-      if (op === "equals" && !compareValue(actual, right)) return false;
-      if (op === "in" && !(value as any[]).includes(actual)) return false;
-      if (op === "notIn" && (value as any[]).includes(actual)) return false;
-      if (op === "gt" && !(actual > (right as any))) return false;
-      if (op === "gte" && !(actual >= (right as any))) return false;
-      if (op === "lt" && !(actual < (right as any))) return false;
-      if (op === "lte" && !(actual <= (right as any))) return false;
-      if (op === "contains") {
-        const a = String(actual ?? ""); const b = String(right ?? "");
-        if (expected.mode === "insensitive" ? !a.toLowerCase().includes(b.toLowerCase()) : !a.includes(b)) return false;
+    const knownOps = new Set(["equals", "in", "notIn", "gt", "gte", "lt", "lte", "contains", "startsWith", "endsWith", "not", "mode"]);
+    const hasKnownOp = Object.keys(expected).some((k) => knownOps.has(k));
+    if (hasKnownOp) {
+      for (const [op, value] of Object.entries(expected)) {
+        if (op === "mode") continue;
+        const right = value instanceof Date ? value.getTime() : value;
+        if (op === "equals" && !compareValue(actual, right)) return false;
+        if (op === "in" && !(value as any[]).includes(actual)) return false;
+        if (op === "notIn" && (value as any[]).includes(actual)) return false;
+        if (op === "gt" && !(actual > (right as any))) return false;
+        if (op === "gte" && !(actual >= (right as any))) return false;
+        if (op === "lt" && !(actual < (right as any))) return false;
+        if (op === "lte" && !(actual <= (right as any))) return false;
+        if (op === "contains") {
+          const a = String(actual ?? ""); const b = String(right ?? "");
+          if (expected.mode === "insensitive" ? !a.toLowerCase().includes(b.toLowerCase()) : !a.includes(b)) return false;
+        }
+        if (op === "startsWith" && !String(actual ?? "").startsWith(String(right))) return false;
+        if (op === "endsWith" && !String(actual ?? "").endsWith(String(right))) return false;
+        if (op === "not" && compareValue(actual, value)) return false;
       }
-      if (op === "startsWith" && !String(actual ?? "").startsWith(String(right))) return false;
-      if (op === "endsWith" && !String(actual ?? "").endsWith(String(right))) return false;
-      if (op === "not" && compareValue(actual, value)) return false;
+      return true;
     }
-    return true;
+    return JSON.stringify(actual) === JSON.stringify(expected);
   }
   if (actual instanceof Date || expected instanceof Date) return new Date(actual).getTime() === new Date(expected).getTime();
   if (typeof actual === "string" && typeof expected === "string") {
@@ -312,18 +322,38 @@ async function all(model: ModelName, forceFresh = false): Promise<Row[]> {
     }
   }
 
-  // 2. Fetch from Firestore with a short timeout so network latency never blocks the UI
+  // 2. Fetch from Firestore with fallback, merging remote updates without losing local records
   try {
     const colRef = collection(firestoreDb, collections[model]);
     const fetchPromise = getDocs(colRef);
-    const timeoutPromise = new Promise<null>((res) => setTimeout(() => res(null), 1200));
+    const timeoutPromise = new Promise<null>((res) => setTimeout(() => res(null), 1500));
     const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (snapshot && !snapshot.empty) {
       for (const document of snapshot.docs) {
         const remoteData = { id: document.id, ...hydrateValue(document.data()) };
-        map.set(document.id, remoteData);
-        memoryStore.get(model)?.set(document.id, remoteData);
+        if (model === "member") {
+          // Find matching local member by memberId, email, or phone
+          const existingKey = Array.from(map.keys()).find((k) => {
+            const item = map.get(k);
+            if (!item) return false;
+            if (remoteData.memberId && item.memberId && item.memberId.toUpperCase() === remoteData.memberId.toUpperCase()) return true;
+            if (remoteData.email && item.email && item.email.toLowerCase() === remoteData.email.toLowerCase()) return true;
+            if (remoteData.phone && item.phone && item.phone === remoteData.phone) return true;
+            return false;
+          });
+          if (existingKey) {
+            const merged = { ...map.get(existingKey), ...remoteData, id: existingKey };
+            map.set(existingKey, merged);
+            memoryStore.get(model)?.set(existingKey, merged);
+          } else {
+            map.set(document.id, remoteData);
+            memoryStore.get(model)?.set(document.id, remoteData);
+          }
+        } else {
+          map.set(document.id, remoteData);
+          memoryStore.get(model)?.set(document.id, remoteData);
+        }
       }
       persistMemoryStore();
     }
@@ -466,15 +496,10 @@ async function createRow(model: ModelName, source: Row): Promise<Row> {
   persistMemoryStore();
   invalidateCache(model);
 
-  // 2. Persist to Firestore (with 1500ms timeout race so it never blocks or hangs)
-  try {
-    const docRef = doc(firestoreDb, collections[model], id);
-    const writePromise = setDoc(docRef, clean(row));
-    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
-    await Promise.race([writePromise, timeoutPromise]);
-  } catch (err) {
+  // 2. Persist to Firestore in background without blocking response
+  void setDoc(doc(firestoreDb, collections[model], id), clean(row)).catch((err) => {
     console.warn(`[Firestore] setDoc failed for ${model}/${id}:`, err);
-  }
+  });
 
   return row;
 }
@@ -496,15 +521,10 @@ async function updateRow(model: ModelName, where: Row, data: Row): Promise<Row> 
   persistMemoryStore();
   invalidateCache(model);
 
-  // Persist to Firestore (with 1500ms timeout race)
-  try {
-    const docRef = doc(firestoreDb, collections[model], found.id);
-    const writePromise = setDoc(docRef, clean(updated), { merge: true });
-    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
-    await Promise.race([writePromise, timeoutPromise]);
-  } catch (err) {
+  // Persist to Firestore in background
+  void setDoc(doc(firestoreDb, collections[model], found.id), clean(updated), { merge: true }).catch((err) => {
     console.warn(`[Firestore] updateDoc failed for ${model}/${found.id}:`, err);
-  }
+  });
 
   return updated;
 }
