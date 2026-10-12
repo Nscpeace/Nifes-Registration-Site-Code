@@ -125,12 +125,10 @@ export default async function Admin({
         <Link href={`/admin/scanner${adminParam}`}>Usher scanner</Link>
         <Link href={`/admin/reports${adminParam}`}>Reports</Link>
         <Link href={`/admin/follow-up${adminParam}`}>First-timer follow-up</Link>
-        {(session.user.role === "SUPER_ADMIN" || session.user.role === "ADMIN") && (
-          <>
-            <Link href={`/admin/access${adminParam}`}>Manage Access</Link>
-            <Link href={`/admin/audit${adminParam}`}>Audit log</Link>
-          </>
+        {session.user.role === "SUPER_ADMIN" && (
+          <Link href={`/admin/access${adminParam}`}>Manage Access</Link>
         )}
+        <Link href={`/admin/audit${adminParam}`}>Audit log</Link>
       </nav>
       <section>
         <h1>Welcome back</h1>

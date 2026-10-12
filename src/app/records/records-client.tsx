@@ -75,6 +75,12 @@ export default function RecordsClient({
     const email = formData.get("email")?.toString().trim().toLowerCase();
     const role = formData.get("role")?.toString() || "ADMIN";
 
+    if (!isSuperAdmin) {
+      setAccessMessage({ text: "Permission denied: Only the Super Admin can authorize accounts or grant access.", error: true });
+      setAddingEmail(false);
+      return;
+    }
+
     if (!email) {
       setAccessMessage({ text: "Please provide a valid email.", error: true });
       setAddingEmail(false);
@@ -123,6 +129,12 @@ export default function RecordsClient({
   }
 
   async function handleRemoveAccess(email: string) {
+    if (!isSuperAdmin) {
+      setAccessMessage({ text: "Permission denied: Only the Super Admin can revoke access.", error: true });
+      setPendingRevokeEmail(null);
+      return;
+    }
+
     const norm = email.toLowerCase();
     if (norm === "nscpeace1@gmail.com") {
       setAccessMessage({ text: "Super Admin Owner nscpeace1@gmail.com cannot be removed.", error: true });
@@ -457,53 +469,74 @@ export default function RecordsClient({
               </div>
             </div>
 
-            {/* Authorize New Email Form */}
-            <form
-              onSubmit={handleAddAuthorizedEmail}
-              style={{
-                marginTop: 18,
-                paddingTop: 16,
-                borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr)) 160px",
-                gap: 12,
-                alignItems: "flex-end",
-              }}
-            >
-              <div className="field">
-                <label htmlFor="new-admin-email" style={{ fontSize: "0.82rem", fontWeight: 600 }}>
-                  Email to Authorize
-                </label>
-                <input
-                  id="new-admin-email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="e.g. colleague@gmail.com"
-                  style={{ width: "100%", padding: "10px 12px" }}
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="admin-role" style={{ fontSize: "0.82rem", fontWeight: 600 }}>
-                  Role Permission
-                </label>
-                <select id="admin-role" name="role" className="dropdown-animated" defaultValue="ADMIN">
-                  <option value="ADMIN">Admin (Full Records Access)</option>
-                  <option value="SUPER_ADMIN">Super Admin (All Permissions)</option>
-                  <option value="USHER">Usher (Check-in Scanner)</option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                disabled={addingEmail}
-                className="button button-primary"
-                style={{ padding: "11px 16px", fontSize: "0.88rem", fontWeight: 700, whiteSpace: "nowrap" }}
+            {/* Authorize New Email Form - Super Admin Only */}
+            {isSuperAdmin ? (
+              <form
+                onSubmit={handleAddAuthorizedEmail}
+                style={{
+                  marginTop: 18,
+                  paddingTop: 16,
+                  borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr)) 160px",
+                  gap: 12,
+                  alignItems: "flex-end",
+                }}
               >
-                {addingEmail ? "Authorizing…" : "+ Authorize Email"}
-              </button>
-            </form>
+                <div className="field">
+                  <label htmlFor="new-admin-email" style={{ fontSize: "0.82rem", fontWeight: 600 }}>
+                    Email to Authorize
+                  </label>
+                  <input
+                    id="new-admin-email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="e.g. colleague@gmail.com"
+                    style={{ width: "100%", padding: "10px 12px" }}
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor="admin-role" style={{ fontSize: "0.82rem", fontWeight: 600 }}>
+                    Role Permission
+                  </label>
+                  <select id="admin-role" name="role" className="dropdown-animated" defaultValue="ADMIN">
+                    <option value="ADMIN">Admin (Full Records Access)</option>
+                    <option value="SUPER_ADMIN">Super Admin (All Permissions)</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={addingEmail}
+                  className="button button-primary"
+                  style={{ padding: "11px 16px", fontSize: "0.88rem", fontWeight: 700, whiteSpace: "nowrap" }}
+                >
+                  {addingEmail ? "Authorizing…" : "+ Authorize Email"}
+                </button>
+              </form>
+            ) : (
+              <div
+                style={{
+                  marginTop: 16,
+                  padding: "12px 16px",
+                  borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  borderRadius: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontSize: "0.85rem",
+                  color: "#94a3b8",
+                }}
+              >
+                <span>🔒</span>
+                <span>
+                  Only the <strong>Super Admin</strong> can grant or revoke member records access.
+                </span>
+              </div>
+            )}
 
             {accessMessage && (
               <div
@@ -576,6 +609,8 @@ export default function RecordsClient({
                       <td>
                         {isOwner ? (
                           <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Protected</span>
+                        ) : !isSuperAdmin ? (
+                          <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Super Admin only</span>
                         ) : pendingRevokeEmail === user.email ? (
                           <div style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
                             <button

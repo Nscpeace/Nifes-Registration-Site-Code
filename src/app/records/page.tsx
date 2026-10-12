@@ -67,6 +67,7 @@ export default async function MemberRecordsPage({
     firstName: m.firstName,
     lastName: m.lastName,
     gender: m.gender,
+    dateOfBirth: m.dateOfBirth ?? null,
     email: m.email ?? null,
     phone: m.phone,
     placeOfResidence: m.placeOfResidence ?? null,

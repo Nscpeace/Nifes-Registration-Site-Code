@@ -111,6 +111,14 @@ export function RegistrationForm() {
               <label><input type="radio" name="gender" value="Female" /> Female</label>
             </fieldset>
 
+            <Field
+              label="Date of birth"
+              name="dateOfBirth"
+              type="date"
+              required={false}
+              placeholder="YYYY-MM-DD"
+            />
+
             <Field label="Email address" name="email" type="email" placeholder="name@example.com" />
             <Field label="Place of residence" name="placeOfResidence" placeholder="Hall of residence or off-campus area" />
 

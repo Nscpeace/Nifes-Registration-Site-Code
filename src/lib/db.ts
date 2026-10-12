@@ -164,9 +164,9 @@ async function syncInitialDataToFirestore() {
     const primaryAdmin = PRIMARY_ADMIN_EMAIL;
     const adminId = `admin_${createHash("sha256").update(primaryAdmin).digest("hex").slice(0, 32)}`;
     const adminRef = doc(firestoreDb, collections.adminUser, adminId);
-    const adminSnap = await getDoc(adminRef);
-    if (!adminSnap.exists()) {
-      await setDoc(adminRef, {
+    void setDoc(
+      adminRef,
+      {
         id: adminId,
         email: primaryAdmin,
         role: "SUPER_ADMIN",
@@ -174,20 +174,16 @@ async function syncInitialDataToFirestore() {
         invitedBy: null,
         createdAt: Timestamp.now(),
         lastLoginAt: null,
-      });
-      console.log(`[Firestore] Seeded initial Super Admin ${primaryAdmin}`);
-    }
+      },
+      { merge: true }
+    ).catch(() => {});
 
-    // 2. Sync all collections from store to Firestore if collection is empty
+    // 2. Sync all collections from local store to Firestore so former records are never lost
     for (const [model, colName] of Object.entries(collections) as [ModelName, string][]) {
-      const snap = await getDocs(collection(firestoreDb, colName));
-      if (snap.empty) {
-        const rows = memoryStore.get(model);
-        if (rows && rows.size > 0) {
-          for (const [id, row] of rows.entries()) {
-            await setDoc(doc(firestoreDb, colName, id), clean(row));
-          }
-          console.log(`[Firestore] Seeded ${rows.size} ${model} records into Firestore`);
+      const rows = memoryStore.get(model);
+      if (rows && rows.size > 0) {
+        for (const [id, row] of rows.entries()) {
+          void setDoc(doc(firestoreDb, colName, id), clean(row), { merge: true }).catch(() => {});
         }
       }
     }
@@ -225,7 +221,7 @@ function hydrateValue(value: any): any {
 function defaults(model: ModelName, data: Row): Row {
   const now = new Date();
   const base: Record<ModelName, Row> = {
-    member: { guest: false, email: null, placeOfResidence: null, heardAbout: null, heardAboutOther: null, level: null, consentGivenAt: null, createdAt: now },
+    member: { guest: false, email: null, dateOfBirth: null, placeOfResidence: null, heardAbout: null, heardAboutOther: null, level: null, consentGivenAt: null, createdAt: now },
     adminUser: { role: "USHER", status: "INVITED", invitedBy: null, createdAt: now, lastLoginAt: null },
     recurringEvent: { timeTBA: false, venue: "FAGCOOP Multipurpose Hall", active: true, checkInOpensMinutes: 60, checkInClosesMinutes: 120 },
     session: { eventId: null, endsAt: null, venue: "FAGCOOP Multipurpose Hall", active: true },
@@ -291,18 +287,64 @@ function compareValue(actual: any, expected: any): boolean {
   return actual === expected;
 }
 
-async function all(model: ModelName): Promise<Row[]> {
+const cacheStore = new Map<ModelName, { rows: Row[]; timestamp: number }>();
+const CACHE_TTL_MS = 10_000;
+
+export function invalidateCache(model?: ModelName) {
+  if (model) cacheStore.delete(model);
+  else cacheStore.clear();
+}
+
+async function all(model: ModelName, forceFresh = false): Promise<Row[]> {
+  initMemoryStore();
+  const now = Date.now();
+  const cached = cacheStore.get(model);
+  if (!forceFresh && cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return cached.rows;
+  }
+
+  // 1. Start with all local persistent records
+  const map = new Map<string, Row>();
+  const localRows = memoryStore.get(model);
+  if (localRows) {
+    for (const [id, row] of localRows.entries()) {
+      map.set(id, { ...row });
+    }
+  }
+
+  // 2. Fetch from Firestore with a short timeout so network latency never blocks the UI
   try {
     const colRef = collection(firestoreDb, collections[model]);
-    const snapshot = await getDocs(colRef);
-    if (!snapshot.empty) {
-      return snapshot.docs.map((document) => ({ id: document.id, ...hydrateValue(document.data()) }));
+    const fetchPromise = getDocs(colRef);
+    const timeoutPromise = new Promise<null>((res) => setTimeout(() => res(null), 1200));
+    const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
+
+    if (snapshot && !snapshot.empty) {
+      for (const document of snapshot.docs) {
+        const remoteData = { id: document.id, ...hydrateValue(document.data()) };
+        map.set(document.id, remoteData);
+        memoryStore.get(model)?.set(document.id, remoteData);
+      }
+      persistMemoryStore();
     }
   } catch (err) {
     console.warn(`[Firestore] all(${model}) read fallback:`, err);
   }
-  initMemoryStore();
-  return Array.from(memoryStore.get(model)?.values() ?? []).map((row) => ({ ...row }));
+
+  // 3. Ensure any local rows missing in Firestore are pushed in background
+  if (localRows && localRows.size > 0) {
+    void Promise.resolve().then(async () => {
+      for (const [id, row] of localRows.entries()) {
+        try {
+          await setDoc(doc(firestoreDb, collections[model], id), clean(row), { merge: true });
+        } catch {}
+      }
+    });
+  }
+
+  const result = Array.from(map.values());
+  cacheStore.set(model, { rows: result, timestamp: now });
+  return result;
 }
 
 async function candidateRows(model: ModelName, where?: Row): Promise<Row[]> {
@@ -417,18 +459,23 @@ async function createRow(model: ModelName, source: Row): Promise<Row> {
     if (matchesExisting) assertUniqueError();
   }
 
-  // Persist to Firestore
-  try {
-    const docRef = doc(firestoreDb, collections[model], id);
-    await setDoc(docRef, clean(row));
-  } catch (err) {
-    console.warn(`[Firestore] setDoc failed for ${model}/${id}:`, err);
-  }
-
+  // 1. Store in memory and disk immediately
   initMemoryStore();
   const store = memoryStore.get(model)!;
   store.set(id, row);
   persistMemoryStore();
+  invalidateCache(model);
+
+  // 2. Persist to Firestore (with 1500ms timeout race so it never blocks or hangs)
+  try {
+    const docRef = doc(firestoreDb, collections[model], id);
+    const writePromise = setDoc(docRef, clean(row));
+    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+    await Promise.race([writePromise, timeoutPromise]);
+  } catch (err) {
+    console.warn(`[Firestore] setDoc failed for ${model}/${id}:`, err);
+  }
+
   return row;
 }
 
@@ -443,18 +490,22 @@ async function updateRow(model: ModelName, where: Row, data: Row): Promise<Row> 
   if (model === "followUp" && !("updatedAt" in next)) next.updatedAt = new Date();
   const updated = { ...found, ...next };
 
-  // Persist to Firestore
-  try {
-    const docRef = doc(firestoreDb, collections[model], found.id);
-    await setDoc(docRef, clean(updated), { merge: true });
-  } catch (err) {
-    console.warn(`[Firestore] updateDoc failed for ${model}/${found.id}:`, err);
-  }
-
   initMemoryStore();
   const store = memoryStore.get(model)!;
   store.set(found.id, updated);
   persistMemoryStore();
+  invalidateCache(model);
+
+  // Persist to Firestore (with 1500ms timeout race)
+  try {
+    const docRef = doc(firestoreDb, collections[model], found.id);
+    const writePromise = setDoc(docRef, clean(updated), { merge: true });
+    const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
+    await Promise.race([writePromise, timeoutPromise]);
+  } catch (err) {
+    console.warn(`[Firestore] updateDoc failed for ${model}/${found.id}:`, err);
+  }
+
   return updated;
 }
 
@@ -462,25 +513,15 @@ async function deleteRow(model: ModelName, where: Row): Promise<Row> {
   const found = (await all(model)).find((row) => Object.entries(flattenWhere(where)).every(([key, value]) => compareValue(row[key], value)));
   if (!found) throw error("P2025", "Record not found.");
 
-  // Delete from Firestore
-  try {
-    const docRef = doc(firestoreDb, collections[model], found.id);
-    await deleteDoc(docRef);
-  } catch (err) {
-    console.warn(`[Firestore] deleteDoc failed for ${model}/${found.id}:`, err);
-  }
-
   initMemoryStore();
   const store = memoryStore.get(model)!;
   store.delete(found.id);
-  if (model === "adminUser") {
-    if (found.email) {
-      const canonicalId = `admin_${createHash("sha256").update(String(found.email).trim().toLowerCase()).digest("hex").slice(0, 32)}`;
-      store.delete(canonicalId);
-      for (const [k, v] of Array.from(store.entries())) {
-        if (v.email && String(v.email).trim().toLowerCase() === String(found.email).trim().toLowerCase()) {
-          store.delete(k);
-        }
+  if (model === "adminUser" && found.email) {
+    const canonicalId = `admin_${createHash("sha256").update(String(found.email).trim().toLowerCase()).digest("hex").slice(0, 32)}`;
+    store.delete(canonicalId);
+    for (const [k, v] of Array.from(store.entries())) {
+      if (v.email && String(v.email).trim().toLowerCase() === String(found.email).trim().toLowerCase()) {
+        store.delete(k);
       }
     }
   }
@@ -495,6 +536,16 @@ async function deleteRow(model: ModelName, where: Row): Promise<Row> {
     for (const [k, v] of attendances) if (v.sessionId === found.id) attendances.delete(k);
   }
   persistMemoryStore();
+  invalidateCache(model);
+
+  // Delete from Firestore
+  try {
+    const docRef = doc(firestoreDb, collections[model], found.id);
+    void deleteDoc(docRef).catch(() => {});
+  } catch (err) {
+    console.warn(`[Firestore] deleteDoc failed for ${model}/${found.id}:`, err);
+  }
+
   return found;
 }
 
@@ -519,22 +570,35 @@ function createModel(model: ModelName): any {
     },
     upsert: async ({ where, create, update, select, include }: Row) => {
       if (model === "memberSequence") {
-        const year = String(create.year ?? where.year);
-        let currentVal = 1;
-        try {
-          const snap = await getDoc(doc(firestoreDb, collections.memberSequence, year));
-          if (snap.exists()) {
-            currentVal = Number(snap.data()?.nextValue || 1);
+        const year = String(create.year ?? where.year ?? new Date().getFullYear());
+        initMemoryStore();
+
+        // Calculate highest sequence number from existing members in memoryStore
+        let highest = 0;
+        const members = memoryStore.get("member");
+        if (members) {
+          for (const m of members.values()) {
+            if (m.memberId && typeof m.memberId === "string") {
+              const match = m.memberId.match(new RegExp(`NIFES-${year}-(\\d+)`));
+              if (match) {
+                const num = parseInt(match[1], 10);
+                if (num > highest) highest = num;
+              }
+            }
           }
-        } catch {}
+        }
+
+        const seqStore = memoryStore.get("memberSequence")!;
+        const existingSeq = seqStore.get(year);
+        const currentVal = Math.max(highest + 1, Number(existingSeq?.nextValue || 1));
         const nextVal = currentVal + Number(update.nextValue?.increment ?? 1);
         const row = { year: Number(year), nextValue: nextVal };
-        try {
-          await setDoc(doc(firestoreDb, collections.memberSequence, year), row);
-        } catch {}
-        initMemoryStore();
-        memoryStore.get(model)?.set(year, row);
+
+        seqStore.set(year, row);
         persistMemoryStore();
+
+        // Sync to Firestore in background without blocking the user
+        void setDoc(doc(firestoreDb, collections.memberSequence, year), row).catch(() => {});
         return project(model, row, { select, include });
       }
       const current = (await findRows(model, { where, take: 1 }))[0];
@@ -563,9 +627,7 @@ db.consumeRateLimit = async (key: string, now: Date, resetAt: Date, maximum: num
   const hits = row && row.resetAt instanceof Date && row.resetAt > now ? row.hits + 1 : 1;
   const updatedRow = { id: key, key, hits, resetAt: row?.resetAt instanceof Date && row.resetAt > now ? row.resetAt : resetAt };
   store.set(key, updatedRow);
-  try {
-    await setDoc(doc(firestoreDb, collections.rateLimit, key), clean(updatedRow));
-  } catch {}
+  void setDoc(doc(firestoreDb, collections.rateLimit, key), clean(updatedRow)).catch(() => {});
   return hits > maximum;
 };
 

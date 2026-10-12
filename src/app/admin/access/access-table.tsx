@@ -125,7 +125,6 @@ export default function AccessTable({ rows, adminEmail }: { rows: U[]; adminEmai
                     >
                       <option value="SUPER_ADMIN">Super Admin</option>
                       <option value="ADMIN">Admin</option>
-                      <option value="USHER">Usher</option>
                     </select>
                   </td>
                   <td>

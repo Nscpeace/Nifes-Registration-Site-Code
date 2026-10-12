@@ -38,7 +38,7 @@ export async function GET(req:Request){
   })];
  }else{
   const records=await db.member.findMany({where:{...(gender?.success?{gender:gender.data}:{}),...(level?.success?{level:level.data}:{}),createdAt:dateRange},orderBy:{createdAt:"desc"}});
-  lines=["First Name,Last Name,Gender,Email,Phone,Residence,Level,Heard About,First Timer,Member ID,Date Registered",...records.map(m=>{const source=m.heardAbout?`${m.heardAbout}${m.heardAboutOther?` (${m.heardAboutOther})`:""}`:"";return[m.firstName,m.lastName,m.gender,m.email,m.phone,m.placeOfResidence,m.level,source,m.firstTimer?"Yes":"No",m.memberId,m.createdAt].map(csv).join(",")})];
+  lines=["First Name,Last Name,Gender,Date of Birth,Email,Phone,Residence,Level,Heard About,First Timer,Member ID,Date Registered",...records.map(m=>{const source=m.heardAbout?`${m.heardAbout}${m.heardAboutOther?` (${m.heardAboutOther})`:""}`:"";return[m.firstName,m.lastName,m.gender,m.dateOfBirth||"",m.email,m.phone,m.placeOfResidence,m.level,source,m.firstTimer?"Yes":"No",m.memberId,m.createdAt].map(csv).join(",")})];
  }
  await db.auditLog.create({data:{adminId:session.user.adminId,action:"DATA_EXPORTED",details:{type,from,to,sessionId,gender:gender?.success?gender.data:null,level:level?.success?level.data:null}}});
  return new NextResponse(lines.join("\r\n"),{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":`attachment; filename=nifes-${type}.csv`}});

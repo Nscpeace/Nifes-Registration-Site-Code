@@ -4,9 +4,9 @@ import { db, isDefaultSuperAdmin, DEFAULT_SUPER_ADMIN_EMAILS } from "@/lib/db";
 import { resolveAdminSession } from "@/lib/access";
 
 export async function POST(req: Request) {
-  const session = await resolveAdminSession(["SUPER_ADMIN", "ADMIN"], undefined, req);
+  const session = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
   if (!session?.user?.adminId) {
-    return NextResponse.json({ error: "Forbidden: Admin access required." }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden: Only Super Admin can authorize accounts and grant access." }, { status: 403 });
   }
 
   try {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     const { email, role } = z.object({
       email: z.string().email(),
-      role: z.enum(["SUPER_ADMIN", "ADMIN", "USHER"]).default("ADMIN"),
+      role: z.enum(["SUPER_ADMIN", "ADMIN"]).default("ADMIN"),
     }).parse(body);
 
     const normalized = email.trim().toLowerCase();
@@ -43,15 +43,15 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const s = await resolveAdminSession(["SUPER_ADMIN", "ADMIN"], undefined, req);
+  const s = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
   if (!s?.user?.adminId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden: Only Super Admin can modify access permissions." }, { status: 403 });
   }
 
   try {
     const d = z.object({
       email: z.string().email(),
-      role: z.enum(["ADMIN", "USHER", "SUPER_ADMIN"]).optional(),
+      role: z.enum(["ADMIN", "SUPER_ADMIN"]).optional(),
       status: z.enum(["INVITED", "ACTIVE", "DISABLED"]).optional(),
     }).parse(await req.json());
 
@@ -79,9 +79,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const s = await resolveAdminSession(["SUPER_ADMIN", "ADMIN"], undefined, req);
+  const s = await resolveAdminSession(["SUPER_ADMIN"], undefined, req);
   if (!s?.user?.adminId) {
-    return NextResponse.json({ error: "Forbidden: Admin access required." }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden: Only Super Admin can revoke access." }, { status: 403 });
   }
 
   try {

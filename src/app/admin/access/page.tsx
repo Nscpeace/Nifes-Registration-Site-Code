@@ -9,7 +9,7 @@ export default async function Access({
   searchParams?: Promise<{ admin?: string }>;
 }) {
   const { admin } = (await searchParams) || {};
-  const session = await requireRole(["SUPER_ADMIN", "ADMIN"], admin);
+  const session = await requireRole(["SUPER_ADMIN"], admin);
   const users = await db.adminUser.findMany({
     include: { inviter: true },
     orderBy: { createdAt: "asc" },

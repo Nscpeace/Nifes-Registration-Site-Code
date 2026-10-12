@@ -58,7 +58,6 @@ export default function AccessForm({ adminEmail }: { adminEmail?: string }) {
           <select id="role" name="role" defaultValue="ADMIN" className="dropdown-animated">
             <option value="ADMIN">Admin (Full Records Access)</option>
             <option value="SUPER_ADMIN">Super Admin (All Permissions)</option>
-            <option value="USHER">Usher (Check-in Scanner)</option>
           </select>
         </div>
       </div>

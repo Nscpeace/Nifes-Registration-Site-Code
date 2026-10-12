@@ -8,6 +8,7 @@ export type Member = {
   firstName: string;
   lastName: string;
   gender: "Male" | "Female";
+  dateOfBirth?: string | null;
   email: string | null;
   phone: string;
   placeOfResidence: string | null;
@@ -52,6 +53,7 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
     const data = Object.fromEntries(fd.entries()) as Record<string, string | boolean | null>;
     data.firstTimer = fd.get("firstTimer") === "on";
     data.level = String(data.level || "") || null;
+    data.dateOfBirth = String(data.dateOfBirth || "").trim() || null;
     data.heardAbout = String(data.heardAbout || "") || null;
     data.heardAboutOther = data.heardAbout === "Other" ? String(data.heardAboutOther || "") : null;
 
@@ -71,6 +73,7 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
         firstName: String(data.firstName),
         lastName: String(data.lastName),
         gender: data.gender as Member["gender"],
+        dateOfBirth: data.dateOfBirth ? String(data.dateOfBirth) : null,
         email: String(data.email || "") || null,
         phone: String(data.phone),
         placeOfResidence: String(data.placeOfResidence || "") || null,
@@ -189,7 +192,14 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
                     Attendance history
                   </Link>
                 </td>
-                <td>{m.gender}</td>
+                <td>
+                  <div>{m.gender}</div>
+                  {m.dateOfBirth && (
+                    <small style={{ display: "block", color: "#85aed3", fontSize: "0.74rem", whiteSpace: "nowrap" }}>
+                      🎂 {m.dateOfBirth}
+                    </small>
+                  )}
+                </td>
                 <td>
                   <div>{m.email || "—"}</div>
                   <small style={{ display: "block", color: "#85aed3" }}>{m.phone}</small>
@@ -227,6 +237,10 @@ export default function MemberTable({ rows, adminEmail }: { rows: Member[]; admi
                           <option>Male</option>
                           <option>Female</option>
                         </select>
+                      </label>
+                      <label className="field" style={{ margin: "4px 0" }}>
+                        Date of birth
+                        <input name="dateOfBirth" type="date" defaultValue={m.dateOfBirth || ""} />
                       </label>
                       <label className="field" style={{ margin: "4px 0" }}>
                         Email

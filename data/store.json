@@ -1,50 +1,95 @@
 {
   "member": [
     {
-      "guest": false,
-      "email": "nkezechibuikem123@gmail.com",
+      "id": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67",
       "placeOfResidence": "Ekosodin",
-      "heardAbout": "Friend",
+      "memberId": "NIFES-2026-0001",
+      "lastName": "Nleze",
+      "phone": "+2347040149267",
+      "firstTimer": true,
       "heardAboutOther": null,
+      "firstName": "Shalom",
+      "heardAbout": "Friend",
+      "email": "nkezechibuikem123@gmail.com",
       "level": "L300",
       "consentGivenAt": "2026-10-10T01:48:28.893Z",
+      "guest": false,
       "createdAt": "2026-10-10T01:48:28.893Z",
-      "memberId": "NIFES-2026-0001",
-      "firstName": "Shalom",
-      "lastName": "Nleze",
-      "gender": "Male",
+      "gender": "Male"
+    },
+    {
+      "id": "922e604c-27b3-4435-9af5-ee451a45b274",
+      "email": "nscpeace1@gmail.com",
+      "level": "L600",
+      "dateOfBirth": "2009-08-13",
+      "consentGivenAt": "2026-10-12T14:55:23.960Z",
+      "phone": "+2348159706643",
+      "firstName": "Rejoice",
+      "placeOfResidence": "Ekosodin",
       "firstTimer": true,
-      "phone": "+2347040149267",
-      "id": "5838cffa-3045-44c0-b4e6-83b3b4dc0f67"
+      "heardAboutOther": null,
+      "heardAbout": "WhatsApp",
+      "lastName": "Nkeze",
+      "memberId": "NIFES-2026-0001",
+      "createdAt": "2026-10-12T14:55:23.960Z",
+      "gender": "Female",
+      "guest": false
+    },
+    {
+      "id": "0786e1ea-93be-4119-b69e-5f3e4aa8f86b",
+      "guest": false,
+      "placeOfResidence": "Hall 1",
+      "gender": "Male",
+      "firstTimer": false,
+      "heardAbout": "WhatsApp",
+      "firstName": "David",
+      "memberId": "NIFES-2026-0003",
+      "consentGivenAt": "2026-10-12T15:09:51.915Z",
+      "phone": "+2348098765432",
+      "lastName": "Eze",
+      "level": "L300",
+      "email": "david.eze@example.com",
+      "dateOfBirth": "2003-08-20",
+      "heardAboutOther": null,
+      "createdAt": "2026-10-12T15:09:51.915Z"
+    },
+    {
+      "id": "34eb3902-7d01-421a-9fcd-396beed5126a",
+      "placeOfResidence": "Hall 2",
+      "guest": false,
+      "createdAt": "2026-10-12T15:09:44.875Z",
+      "heardAboutOther": null,
+      "gender": "Male",
+      "heardAbout": "Friend",
+      "firstTimer": true,
+      "memberId": "NIFES-2026-0002",
+      "consentGivenAt": "2026-10-12T15:09:44.875Z",
+      "lastName": "Okafor",
+      "firstName": "Emmanuel",
+      "email": "emmanuel.test@example.com",
+      "level": "L200",
+      "phone": "+2348012345678",
+      "dateOfBirth": "2002-05-14"
     }
   ],
   "adminUser": [
     {
       "id": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-10T05:09:04.511Z",
+      "lastLoginAt": null,
+      "role": "SUPER_ADMIN",
       "email": "nscpeace1@gmail.com",
-      "role": "SUPER_ADMIN",
-      "status": "ACTIVE",
       "invitedBy": null,
-      "createdAt": "2026-10-09T20:36:36.814Z",
-      "lastLoginAt": null
+      "status": "ACTIVE"
     },
     {
-      "role": "USHER",
-      "status": "ACTIVE",
-      "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
-      "createdAt": "2026-10-10T01:45:40.295Z",
-      "lastLoginAt": null,
+      "id": "admin_33d53392567b7440a624c8af29eb811b",
       "email": "nkezechibuikem123@gmail.com",
-      "id": "admin_33d53392567b7440a624c8af29eb811b"
-    },
-    {
-      "role": "SUPER_ADMIN",
       "status": "ACTIVE",
+      "role": "ADMIN",
       "invitedBy": "admin_4ab94c426c704d3236961397aaf0533a",
-      "createdAt": "2026-10-10T01:45:49.077Z",
-      "lastLoginAt": null,
-      "email": "nscpeace2@gmail.com",
-      "id": "admin_19debf2c79e8a9164c45326537e9ba6d"
+      "createdAt": "2026-10-12T14:51:24.713Z",
+      "lastLoginAt": null
     }
   ],
   "recurringEvent": [
@@ -178,42 +223,238 @@
   "followUp": [],
   "auditLog": [
     {
+      "id": "f05709c5-8207-4461-ae3c-9fdf066197d0",
+      "action": "ACCESS_INVITED",
+      "createdAt": "2026-10-09T20:37:43.584Z",
       "details": {
         "email": "sistermary@gmail.com",
         "role": "ADMIN"
       },
-      "createdAt": "2026-10-09T20:37:43.584Z",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
-      "action": "ACCESS_INVITED",
-      "id": "f05709c5-8207-4461-ae3c-9fdf066197d0"
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
-      "details": {
-        "email": "nkezechibuikem123@gmail.com",
-        "role": "USHER"
-      },
+      "id": "3b27ed30-0efd-414e-9ecd-56d0a83cb3d2",
+      "action": "ACCESS_INVITED",
       "createdAt": "2026-10-10T01:45:40.296Z",
-      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
-      "action": "ACCESS_INVITED",
-      "id": "3b27ed30-0efd-414e-9ecd-56d0a83cb3d2"
+      "details": {
+        "role": "USHER",
+        "email": "nkezechibuikem123@gmail.com"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
     },
     {
+      "id": "ec56177d-5b9a-4348-8a35-4d5796988698",
+      "createdAt": "2026-10-10T01:45:49.078Z",
+      "action": "ACCESS_INVITED",
+      "details": {
+        "role": "SUPER_ADMIN",
+        "email": "nscpeace2@gmail.com"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "53abba8f-e298-4f8b-b14b-8b5a78d42011",
+      "action": "ACCESS_REMOVED",
+      "createdAt": "2026-10-12T14:14:34.478Z",
+      "details": {
+        "role": "USHER",
+        "email": "nscpeace2@gmail.com"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "cadc0af1-3610-4dca-a020-29688061128e",
+      "createdAt": "2026-10-12T14:15:05.836Z",
+      "details": {
+        "role": "ADMIN",
+        "email": "nkezechibuikem123@gmail.com"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "ACCESS_REMOVED"
+    },
+    {
+      "id": "ea1625ed-ee06-414e-abc1-c2e9492005b7",
+      "createdAt": "2026-10-12T14:15:17.276Z",
+      "action": "ACCESS_INVITED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "details": {
         "email": "nscpeace2@gmail.com",
-        "role": "SUPER_ADMIN"
+        "role": "ADMIN"
+      }
+    },
+    {
+      "id": "21d11371-d0d9-4a10-b78c-08fd4c12fd60",
+      "action": "ACCESS_INVITED",
+      "createdAt": "2026-10-12T14:15:48.121Z",
+      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d",
+      "details": {
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "ADMIN"
+      }
+    },
+    {
+      "id": "8d7f2d27-ccee-4eec-ae62-b2fe42869993",
+      "adminId": "admin_19debf2c79e8a9164c45326537e9ba6d",
+      "details": {
+        "email": "nkezechibuikem123@gmail.com",
+        "role": "ADMIN"
       },
-      "createdAt": "2026-10-10T01:45:49.078Z",
+      "action": "ACCESS_REMOVED",
+      "createdAt": "2026-10-12T14:16:15.098Z"
+    },
+    {
+      "id": "d2121e2b-bb26-430d-bd9d-0c54b9b64369",
+      "createdAt": "2026-10-12T14:51:24.839Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "role": "ADMIN",
+        "email": "nkezechibuikem123@gmail.com"
+      },
+      "action": "ACCESS_INVITED"
+    },
+    {
+      "id": "3a471bf6-66b5-4007-abc5-9476ac99bc4a",
+      "action": "ACCESS_REMOVED",
+      "createdAt": "2026-10-12T14:51:31.963Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "email": "nscpeace2@gmail.com",
+        "role": "ADMIN"
+      }
+    },
+    {
+      "id": "11e8a312-eda9-446b-91be-fc1ca829c076",
+      "createdAt": "2026-10-10T05:09:05.106Z",
+      "action": "ACCESS_INVITED",
+      "details": {
+        "role": "ADMIN",
+        "email": "nkezechibuikem123@gmail.com"
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a"
+    },
+    {
+      "id": "2e693307-95b1-40f2-be1e-4945a2c5695b",
+      "action": "ACCESS_REMOVED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "role": "USHER",
+        "email": "nkezechibuikem123@gmail.com"
+      },
+      "createdAt": "2026-10-10T05:08:47.708Z"
+    },
+    {
+      "id": "38ad7936-0d96-45ea-a27c-7ec767592e89",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "from": null,
+        "level": null,
+        "sessionId": null,
+        "to": null,
+        "gender": null,
+        "type": "members"
+      },
+      "createdAt": "2026-10-10T13:57:44.008Z",
+      "action": "DATA_EXPORTED"
+    },
+    {
+      "id": "5d5706f5-ad3d-4c3f-aa1b-7eaf2205cee2",
+      "createdAt": "2026-10-10T13:59:58.070Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "role": "ADMIN",
+        "email": "nscpeace2@gmail.com"
+      },
+      "action": "ACCESS_REMOVED"
+    },
+    {
+      "id": "61a44ec4-a00a-4a16-a5ec-b34c1affe69f",
+      "createdAt": "2026-10-10T13:59:44.154Z",
+      "action": "ACCESS_INVITED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "role": "ADMIN",
+        "email": "nscpeace2@gmail.com"
+      }
+    },
+    {
+      "id": "650e1f35-b003-410c-9f67-0c6a15d2f397",
+      "createdAt": "2026-10-10T13:59:06.366Z",
+      "adminId": "admin_33d53392567b7440a624c8af29eb811b",
+      "details": {
+        "email": "nscpeace2@gmail.com",
+        "role": "ADMIN"
+      },
+      "action": "ACCESS_REMOVED"
+    },
+    {
+      "id": "944b8e08-faa4-4cfd-b8db-490bb6828daa",
+      "details": {
+        "email": "nscpeace2@gmail.com",
+        "role": "ADMIN"
+      },
       "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
       "action": "ACCESS_INVITED",
-      "id": "ec56177d-5b9a-4348-8a35-4d5796988698"
+      "createdAt": "2026-10-10T05:08:56.177Z"
+    },
+    {
+      "id": "e54968aa-0dba-4dc5-99e8-8438423382c9",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "role": "USHER",
+        "email": "nscpeace2@gmail.com"
+      },
+      "createdAt": "2026-10-10T14:00:06.522Z",
+      "action": "ACCESS_INVITED"
+    },
+    {
+      "id": "0e391ce4-ccfb-4a0a-ab61-f40e8d1e7a45",
+      "action": "DATA_EXPORTED",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "details": {
+        "from": null,
+        "gender": null,
+        "type": "members",
+        "sessionId": null,
+        "to": null,
+        "level": null
+      },
+      "createdAt": "2026-10-12T15:09:29.880Z"
+    },
+    {
+      "id": "827acae6-efe4-4fe9-9768-ce93f902c3a3",
+      "action": "DATA_EXPORTED",
+      "details": {
+        "to": null,
+        "from": null,
+        "sessionId": null,
+        "level": null,
+        "type": "members",
+        "gender": null
+      },
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "createdAt": "2026-10-12T15:09:55.832Z"
+    },
+    {
+      "details": {
+        "type": "members",
+        "from": null,
+        "to": null,
+        "sessionId": null,
+        "gender": null,
+        "level": null
+      },
+      "createdAt": "2026-10-12T15:10:20.928Z",
+      "adminId": "admin_4ab94c426c704d3236961397aaf0533a",
+      "action": "DATA_EXPORTED",
+      "id": "91e63078-42cb-456f-8171-7fac1a918f08"
     }
   ],
   "rateLimit": [
     {
-      "id": "register:be715a44aa8235e285a81cebe693122e763764e2b2a946dee2e0eebe6c6489f2",
-      "key": "register:be715a44aa8235e285a81cebe693122e763764e2b2a946dee2e0eebe6c6489f2",
-      "hits": 1,
-      "resetAt": "2026-10-10T02:48:28.888Z"
+      "id": "register:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "key": "register:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "hits": 2,
+      "resetAt": "2026-10-12T16:09:44.615Z"
     }
   ],
   "memberSequence": []
